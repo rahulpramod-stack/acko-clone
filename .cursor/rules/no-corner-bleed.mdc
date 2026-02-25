@@ -1,0 +1,45 @@
+---
+description: Prevent background-color corner bleeds on the 40px-radius phone shell
+globs: ["web-app/src/App.tsx", "web-app/src/screens/*.tsx"]
+alwaysApply: true
+---
+
+# No Corner Bleed Rule
+
+The phone shell in `App.tsx` clips all content to a **40px border-radius** using `overflow: hidden`.
+At those corners the shell's own `backgroundColor` is visible via sub-pixel anti-aliasing —
+even when a child div with a different color sits "on top".
+
+## Required invariant
+
+> **`shell(bg, …)` → `bg` must exactly match the screen's outermost wrapper `backgroundColor`.**
+
+| Screen | Outer wrapper bg | Correct shell bg |
+|---|---|---|
+| HomeTabScreen | `#19191a` | `#19191a` |
+| ExploreScreen | `#060606` | `#060606` |
+| SupportTabScreen | `#19191a` (EmergencySection is first) | `#19191a` |
+| VehicleDetailScreen | `#19191a` | `#19191a` |
+| FamilyScreen | `#19191a` (dark hero is first section) | `#19191a` |
+| QuestionnaireScreen | `#ffffff` | `#ffffff` |
+| AnalysingScreen | `#ffffff` | `#ffffff` |
+| ScoreAnalysisScreen | `#ffffff` | `#ffffff` |
+
+## Rules for new screens
+
+1. Every screen's **outermost `<div>`** must declare an explicit `backgroundColor` (no transparent root).
+2. The color must match what is **visually at the top-left and top-right corners** of that screen
+   (i.e. the first visible section background, not the scroll body).
+3. When adding a new `shell(...)` call in `App.tsx`, set `bg` to that same color.
+4. Screens with a **dark hero + white body** use `#19191a` for both the outer wrapper and the shell —
+   the white body sections must have their own explicit bg on their child divs.
+
+## What NOT to do
+
+```tsx
+// ✗ Shell is white, but screen's first section is dark → white corner bleed
+shell("#ffffff", <FamilyScreen />)   // FamilyScreen hero = #19191a
+
+// ✓ Both match
+shell("#19191a", <FamilyScreen />)
+```

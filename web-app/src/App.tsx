@@ -145,6 +145,9 @@ export default function App() {
     setView(categoryToView[cat]);
   }, []);
 
+  // CONVENTION: `bg` must match the screen's outermost wrapper backgroundColor.
+  // If they differ, the shell's bg bleeds through the 40px border-radius corners.
+  // Dark-top screens → "#19191a". White screens → "#ffffff".
   const shell = (bg: string, children: React.ReactNode) => (
     <div
       className="relative overflow-hidden"
@@ -192,7 +195,7 @@ export default function App() {
 
   if (view.type === "vehicle-detail" || view.type === "family") {
     return shell(
-      view.type === "family" ? "#ffffff" : "#19191a",
+      "#19191a",
       <>
         {view.type === "vehicle-detail" && (
           <VehicleDetailScreen

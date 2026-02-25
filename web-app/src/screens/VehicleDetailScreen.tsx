@@ -145,7 +145,7 @@ export default function VehicleDetailScreen({ onBack, onCategoryChange }: { onBa
   const { scrollRef, visible } = useNavScrollVisibility();
 
   return (
-    <div className="relative flex flex-col h-full">
+    <div className="relative flex flex-col h-full" style={{ backgroundColor: "#19191a" }}>
       <div ref={scrollRef} className="overflow-y-auto no-scrollbar flex-1" style={{ paddingBottom: 100 }}>
 
       {/* ── Dark header ─────────────────────────────────────────────────── */}
