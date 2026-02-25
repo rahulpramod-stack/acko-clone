@@ -1,7 +1,11 @@
 import Lottie from "lottie-react";
 import crownAnimation from "../assets/animated/crown.json";
 
-export default function Header() {
+interface Props {
+  onNotificationsClick?: () => void;
+}
+
+export default function Header({ onNotificationsClick }: Props) {
   return (
     <div className="flex items-center justify-between px-4 pt-3 pb-4">
       {/* Left: avatar + greeting */}
@@ -23,12 +27,16 @@ export default function Header() {
           />
           <span className="text-[#FBE67B] text-xs font-medium">Privileges</span>
         </div>
-        <div className="relative">
+        <button
+          className="relative"
+          onClick={onNotificationsClick}
+          style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+        >
           <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#D83D37] rounded-full flex items-center justify-center z-10">
             <span className="text-white text-[9px] font-semibold">2</span>
           </div>
           <img src="./assets/icons/Notification_Bell.svg" alt="Notifications" className="w-5 h-6 object-contain" />
-        </div>
+        </button>
       </div>
     </div>
   );

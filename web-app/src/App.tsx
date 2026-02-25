@@ -7,6 +7,7 @@ import FamilyScreen from "./screens/FamilyScreen";
 import QuestionnaireScreen, { type Question } from "./screens/QuestionnaireScreen";
 import AnalysingScreen from "./screens/AnalysingScreen";
 import ScoreAnalysisScreen from "./screens/ScoreAnalysisScreen";
+import NotificationsScreen from "./screens/NotificationsScreen";
 import BottomNav, { type Tab } from "./components/BottomNav";
 import type { Category } from "./components/FloatingCategoryNav";
 
@@ -16,7 +17,8 @@ type View =
   | { type: "family"; riskScore?: number }
   | { type: "questionnaire" }
   | { type: "analysing" }
-  | { type: "score-analysis" };
+  | { type: "score-analysis" }
+  | { type: "notifications" };
 
 const bgByTab: Record<Tab, string> = {
   home: "#19191a",
@@ -165,6 +167,13 @@ export default function App() {
     </div>
   );
 
+  if (view.type === "notifications") {
+    return shell(
+      "#ffffff",
+      <NotificationsScreen onBack={() => setView({ type: "tabs" })} />,
+    );
+  }
+
   if (view.type === "analysing") {
     return shell(
       "#ffffff",
@@ -232,6 +241,7 @@ export default function App() {
             <HomeTabScreen
               onVehicleClick={() => setView({ type: "vehicle-detail" })}
               onFamilyClick={() => setView({ type: "family" })}
+              onNotificationsClick={() => setView({ type: "notifications" })}
             />
           )}
           {activeTab === "explore" && <ExploreScreen />}

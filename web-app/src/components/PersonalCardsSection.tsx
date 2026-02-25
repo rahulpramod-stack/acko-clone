@@ -84,13 +84,47 @@ function EntityCard({
   );
 }
 
-export default function PersonalCardsSection({ onVehicleClick, onFamilyClick }: { onVehicleClick?: () => void; onFamilyClick?: () => void }) {
+export default function PersonalCardsSection({
+  onVehicleClick,
+  onFamilyClick,
+  onNotificationsClick,
+}: {
+  onVehicleClick?: () => void;
+  onFamilyClick?: () => void;
+  onNotificationsClick?: () => void;
+}) {
   return (
     <div className="flex flex-col gap-5 pb-6" style={{ backgroundColor: "#19191a" }}>
       <div className="flex flex-col gap-5 px-4 pt-5">
-        <p className="font-semibold text-white" style={{ fontSize: 20, lineHeight: "28px", letterSpacing: "-0.1px" }}>
-          Vishwanath's home
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="font-semibold text-white" style={{ fontSize: 20, lineHeight: "28px", letterSpacing: "-0.1px" }}>
+            Vishwanath's home
+          </p>
+          <button
+            onClick={onNotificationsClick}
+            className="relative flex items-center justify-center"
+            style={{ background: "none", border: "none", padding: 4, cursor: "pointer" }}
+          >
+            <div
+              className="absolute flex items-center justify-center"
+              style={{
+                width: 16, height: 16,
+                backgroundColor: "#D83D37",
+                borderRadius: "50%",
+                top: 0, right: 0,
+                fontSize: 9, fontWeight: 600, color: "#ffffff",
+                zIndex: 1,
+              }}
+            >
+              2
+            </div>
+            <img
+              src="./assets/icons/Notification_Bell.svg"
+              alt="Notifications"
+              style={{ width: 20, height: 24, objectFit: "contain" }}
+            />
+          </button>
+        </div>
         <div className="flex flex-col gap-3">
           <div className="flex gap-3">
             <EntityCard
