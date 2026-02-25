@@ -1,8 +1,8 @@
-const imgAbha           = "/assets/icons/ABHA.svg";
-const imgHealthAnalyse  = "/assets/icons/policy health analyser.svg";
-const imgAmbulance      = "/assets/icons/Ambulance.svg";
-const imgArrow          = "/assets/icons/arrow right.svg";
-const imgHealthBag      = "/assets/lob/Health bag.png";
+const imgAbha           = "./assets/icons/ABHA.svg";
+const imgHealthAnalyse  = "./assets/icons/policy health analyser.svg";
+const imgAmbulance      = "./assets/icons/Ambulance.svg";
+const imgArrow          = "./assets/icons/arrow right.svg";
+const imgHealthBag      = "./assets/lob/Health bag.png";
 
 function ServiceIcon({ icon, label, borderColor = "#dceade" }: { icon: string; label: string; borderColor?: string }) {
   return (

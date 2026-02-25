@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
-const imgAmbu1 = "/assets/lob/Towing my car.png";
-const imgAmbu2 = "/assets/lob/Book ambulance.png";
-const imgBatteryImg = "/assets/lob/Battery jump start.png";
-const imgFlatTyreImg = "/assets/lob/Flat tyre.png";
-const imgFuelImg = "/assets/lob/Out of fuel.png";
+const imgAmbu1 = "./assets/lob/Towing my car.png";
+const imgAmbu2 = "./assets/lob/Book ambulance.png";
+const imgBatteryImg = "./assets/lob/Battery jump start.png";
+const imgFlatTyreImg = "./assets/lob/Flat tyre.png";
+const imgFuelImg = "./assets/lob/Out of fuel.png";
 
 // ── Time badges ─────────────────────────────────────────────────────────────
 
@@ -14,7 +14,7 @@ function ClockBadge({ mins }: { mins: number }) {
       className="inline-flex gap-[2px] items-center justify-center rounded-[49px]"
       style={{ border: "1px solid #474649", padding: "4px" }}
     >
-      <img src="/assets/icons/clock.svg" alt="" style={{ width: 12, height: 12 }} />
+      <img src="./assets/icons/clock.svg" alt="" style={{ width: 12, height: 12 }} />
       <span style={{ fontSize: 10, lineHeight: "14px", color: "#a6a6a6" }}>
         <span style={{ fontWeight: 700 }}>{mins}</span> mins
       </span>
@@ -28,7 +28,7 @@ function LightningBadge({ mins }: { mins: number }) {
       className="inline-flex gap-[2px] items-center justify-center rounded-[49px]"
       style={{ border: "1px solid #0fa457", padding: "4px" }}
     >
-      <img src="/assets/icons/lightning.svg" alt="" style={{ width: 8, height: 12 }} />
+      <img src="./assets/icons/lightning.svg" alt="" style={{ width: 8, height: 12 }} />
       <span style={{ fontSize: 10, lineHeight: "14px", color: "#a6a6a6" }}>
         <span style={{ fontWeight: 700 }}>{mins}</span> mins
       </span>
@@ -89,7 +89,7 @@ function ServiceCard({ title, badge, imageSrc, imageContainerStyle, flipX }: Ser
 function ArrowBtnDark() {
   return (
     <div className="overflow-hidden shrink-0" style={{ width: 22, height: 22 }}>
-      <img src="/assets/icons/arrow-right-dark.svg" alt="" className="w-full h-full" />
+      <img src="./assets/icons/arrow-right-dark.svg" alt="" className="w-full h-full" />
     </div>
   );
 }
@@ -150,9 +150,9 @@ function EmergencySection() {
               All services
             </span>
             <div className="relative shrink-0 opacity-50" style={{ width: 20, height: 20 }}>
-              <img src="/assets/icons/arrow-circle.svg" alt="" className="absolute inset-0 w-full h-full" />
+              <img src="./assets/icons/arrow-circle.svg" alt="" className="absolute inset-0 w-full h-full" />
               <img
-                src="/assets/icons/arrow-right-white.svg"
+                src="./assets/icons/arrow-right-white.svg"
                 alt=""
                 className="absolute"
                 style={{ width: 9, height: 8, top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
@@ -218,9 +218,9 @@ function PolicyActionsSection() {
 
       {/* 3 action cards */}
       <div className="flex gap-2">
-        <ActionServiceCard icon="/assets/icons/policy-download.svg" label="Download policy" />
-        <ActionServiceCard icon="/assets/icons/view-policy.svg" label={"View\npolicy"} />
-        <ActionServiceCard icon="/assets/icons/edit.svg" label={"Edit\npolicy"} />
+        <ActionServiceCard icon="./assets/icons/policy-download.svg" label="Download policy" />
+        <ActionServiceCard icon="./assets/icons/view-policy.svg" label={"View\npolicy"} />
+        <ActionServiceCard icon="./assets/icons/edit.svg" label={"Edit\npolicy"} />
       </div>
 
       {/* Transfer row */}
@@ -233,7 +233,7 @@ function PolicyActionsSection() {
         }}
       >
         <div className="flex gap-3 items-center">
-          <img src="/assets/icons/transfer.svg" alt="" style={{ width: 21, height: 21 }} />
+          <img src="./assets/icons/transfer.svg" alt="" style={{ width: 21, height: 21 }} />
           <p className="font-medium text-[#121212]" style={{ fontSize: 12, lineHeight: "20px" }}>
             Transfer an existing ACKO policy
           </p>
@@ -253,9 +253,9 @@ function ClaimActionsSection() {
         Claim actions
       </p>
       <div className="flex gap-2">
-        <ActionServiceCard icon="/assets/icons/ABHA.svg"        label="Download health e-cards" />
-        <ActionServiceCard icon="/assets/icons/claim-action.svg" label="Update on my claim status" />
-        <ActionServiceCard icon="/assets/icons/file-a-new.svg"  label="File a new claim" />
+        <ActionServiceCard icon="./assets/icons/ABHA.svg"        label="Download health e-cards" />
+        <ActionServiceCard icon="./assets/icons/claim-action.svg" label="Update on my claim status" />
+        <ActionServiceCard icon="./assets/icons/file-a-new.svg"  label="File a new claim" />
       </div>
     </div>
   );
@@ -276,7 +276,7 @@ function NeedMoreHelpSection() {
           style={{ background: "#f5f5f5", border: "1px solid #ffffff" }}
         >
           <div className="flex gap-2 items-center">
-            <img src="/assets/icons/talk-to-us.svg" alt="" style={{ width: 21, height: 21 }} />
+            <img src="./assets/icons/talk-to-us.svg" alt="" style={{ width: 21, height: 21 }} />
             <div className="flex flex-col gap-0.5">
               <p className="font-medium text-[#121212]" style={{ fontSize: 14, lineHeight: "20px" }}>
                 Talk to us
@@ -295,7 +295,7 @@ function NeedMoreHelpSection() {
           style={{ background: "#f5f5f5", border: "1px solid #ffffff" }}
         >
           <div className="flex gap-2 items-center">
-            <img src="/assets/icons/write-to-us.svg" alt="" style={{ width: 21, height: 21 }} />
+            <img src="./assets/icons/write-to-us.svg" alt="" style={{ width: 21, height: 21 }} />
             <div className="flex flex-col gap-0.5">
               <p className="font-medium text-[#121212]" style={{ fontSize: 14, lineHeight: "20px" }}>
                 Write to us
@@ -377,11 +377,11 @@ function ChatbotSection() {
       <div className="flex flex-col items-center gap-3 pt-4 pb-2 chatbot-child chatbot-d1">
         <div className="relative" style={{ width: 88, height: 88 }}>
           <div className="w-full h-full rounded-full bg-white overflow-hidden flex items-center justify-center">
-            <img src="/assets/icons/aashiq-logo.svg" alt="Aashiq" style={{ width: "53%", height: "41%" }} />
+            <img src="./assets/icons/aashiq-logo.svg" alt="Aashiq" style={{ width: "53%", height: "41%" }} />
           </div>
           {/* Online dot */}
           <img
-            src="/assets/icons/online-dot.svg"
+            src="./assets/icons/online-dot.svg"
             alt=""
             className="absolute"
             style={{ width: "22.73%", height: "22.73%", bottom: 0, right: 0 }}
@@ -407,7 +407,7 @@ function ChatbotSection() {
       {/* Continue previous chat card */}
       <div className="flex items-start gap-3 p-3 rounded-2xl mt-4 chatbot-child chatbot-d2" style={{ background: "#efe9fb" }}>
         <div className="flex items-center justify-center rounded-full bg-white shrink-0" style={{ width: 32, height: 32 }}>
-          <img src="/assets/icons/chat-history.svg" alt="" style={{ width: 16, height: 16 }} />
+          <img src="./assets/icons/chat-history.svg" alt="" style={{ width: 16, height: 16 }} />
         </div>
         <div className="flex flex-col gap-1">
           <p className="font-medium text-black" style={{ fontSize: 14, lineHeight: "20px" }}>
@@ -471,7 +471,7 @@ function AskInput() {
         }}
       >
         <p style={{ fontSize: 14, lineHeight: "20px", color: "#757575" }}>Ask me anything</p>
-        <img src="/assets/icons/send-btn.svg" alt="Send" style={{ width: 16, height: 16 }} />
+        <img src="./assets/icons/send-btn.svg" alt="Send" style={{ width: 16, height: 16 }} />
       </div>
     </div>
   );

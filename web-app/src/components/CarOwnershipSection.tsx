@@ -1,8 +1,8 @@
-const imgChallans     = "/assets/icons/Challan.svg";
-const imgVehicleInfo  = "/assets/icons/Services_RTO_info.svg";
-const imgFastag       = "/assets/icons/Recharge fastag.svg";
-const imgArrow        = "/assets/icons/arrow right.svg";
-const imgWorryFree    = "/assets/lob/Worry free.png";
+const imgChallans     = "./assets/icons/Challan.svg";
+const imgVehicleInfo  = "./assets/icons/Services_RTO_info.svg";
+const imgFastag       = "./assets/icons/Recharge fastag.svg";
+const imgArrow        = "./assets/icons/arrow right.svg";
+const imgWorryFree    = "./assets/lob/Worry free.png";
 
 function ServiceIcon({ icon, label, borderColor = "#dceade" }: { icon: string; label: string; borderColor?: string }) {
   return (

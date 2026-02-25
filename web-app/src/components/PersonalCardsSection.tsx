@@ -1,16 +1,16 @@
 const imgCityLogo   = "https://www.figma.com/api/mcp/asset/764b3535-8c4e-4e59-97a1-42479d9c00f9";
 const imgCretaLogo  = "https://www.figma.com/api/mcp/asset/0914e72f-656e-4187-bb0f-b647211875c5";
-const imgFlightIcon = "/assets/icons/trips.svg";
-const imgPhoneIcon  = "/assets/icons/devices.svg";
+const imgFlightIcon = "./assets/icons/trips.svg";
+const imgPhoneIcon  = "./assets/icons/devices.svg";
 
 const cardShadow = "0px 4px 10px -2px rgba(54,53,76,0.08)";
 
 function ArrowButton() {
   return (
     <div className="relative shrink-0 opacity-50" style={{ width: 20, height: 20 }}>
-      <img src="/assets/icons/arrow-circle.svg" alt="" className="absolute inset-0 w-full h-full" />
+      <img src="./assets/icons/arrow-circle.svg" alt="" className="absolute inset-0 w-full h-full" />
       <img
-        src="/assets/icons/arrow-right-white.svg"
+        src="./assets/icons/arrow-right-white.svg"
         alt=""
         className="absolute"
         style={{ width: 9, height: 8, top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}

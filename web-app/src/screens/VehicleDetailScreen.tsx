@@ -4,7 +4,7 @@ const imgCityLogo   = "https://www.figma.com/api/mcp/asset/2f50b563-4b1e-44b2-8b
 const imgPunchLogo  = "https://www.figma.com/api/mcp/asset/8cf3b849-c8f5-4516-9833-c38cb2a74843";
 const imgThirdCar   = "https://www.figma.com/api/mcp/asset/54147f94-1c80-403b-892e-f03e258c1ed7";
 const imgAddIcon    = "https://www.figma.com/api/mcp/asset/37891e16-b389-4736-8685-da3828ca2842";
-const imgRefreshIcon     = "/assets/icons/refresh.svg";
+const imgRefreshIcon     = "./assets/icons/refresh.svg";
 const imgRC         = "https://www.figma.com/api/mcp/asset/b7c8721c-ae47-4dbe-891c-a2d526c1091d";
 const imgDL         = "https://www.figma.com/api/mcp/asset/a1e290c8-a64d-4a41-bcf9-9316ea8fecdd";
 const imgEllipseAdd = "https://www.figma.com/api/mcp/asset/2b3050cf-bd97-426b-a65e-25dd49b8d969";
@@ -20,7 +20,7 @@ const imgInfoIcon   = "https://www.figma.com/api/mcp/asset/383d3be4-a06b-4383-8a
 function ArrowBtnWhite() {
   return (
     <div className="overflow-hidden shrink-0" style={{ width: 22, height: 22 }}>
-      <img src="/assets/icons/arrow-right.svg" alt="" className="w-full h-full" />
+      <img src="./assets/icons/arrow-right.svg" alt="" className="w-full h-full" />
     </div>
   );
 }
@@ -28,7 +28,7 @@ function ArrowBtnWhite() {
 function ArrowBtnDark() {
   return (
     <div className="overflow-hidden shrink-0" style={{ width: 22, height: 22 }}>
-      <img src="/assets/icons/arrow-right-dark.svg" alt="" className="w-full h-full" />
+      <img src="./assets/icons/arrow-right-dark.svg" alt="" className="w-full h-full" />
     </div>
   );
 }

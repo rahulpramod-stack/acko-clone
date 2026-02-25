@@ -4,20 +4,20 @@ const tabs: { id: Tab; label: string; active: string; default: string }[] = [
   {
     id: "explore",
     label: "Explore",
-    active: "/assets/nav/explore-active.svg",
-    default: "/assets/nav/explore-default.svg",
+    active: "./assets/nav/explore-active.svg",
+    default: "./assets/nav/explore-default.svg",
   },
   {
     id: "home",
     label: "Home",
-    active: "/assets/nav/home-active.svg",
-    default: "/assets/nav/home-default.svg",
+    active: "./assets/nav/home-active.svg",
+    default: "./assets/nav/home-default.svg",
   },
   {
     id: "support",
     label: "Support",
-    active: "/assets/nav/support-active.svg",
-    default: "/assets/nav/support-default.svg",
+    active: "./assets/nav/support-active.svg",
+    default: "./assets/nav/support-default.svg",
   },
 ];
 

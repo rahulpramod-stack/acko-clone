@@ -23,7 +23,7 @@ export default function Header() {
           <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#D83D37] rounded-full flex items-center justify-center z-10">
             <span className="text-white text-[9px] font-semibold">2</span>
           </div>
-          <img src="/assets/icons/Notification_Bell.svg" alt="Notifications" className="w-5 h-6 object-contain" />
+          <img src="./assets/icons/Notification_Bell.svg" alt="Notifications" className="w-5 h-6 object-contain" />
         </div>
       </div>
     </div>

@@ -1,14 +1,14 @@
 // Local quick-card icons
-const imgPolicyIcon = "/assets/icons/Your Policy.svg";
-const imgMoneyIcon  = "/assets/icons/Rewards.svg";
-const imgChevron    = "/assets/icons/arrow right.svg";
+const imgPolicyIcon = "./assets/icons/Your Policy.svg";
+const imgMoneyIcon  = "./assets/icons/Rewards.svg";
+const imgChevron    = "./assets/icons/arrow right.svg";
 
 // Local LOB assets (served from /public)
-const imgCar      = "/assets/lob/Car.png";
-const imgHospital = "/assets/lob/Hospital.png";
-const imgBike     = "/assets/lob/Bike.png";
-const imgTravel   = "/assets/lob/Travel.png";
-const imgLife     = "/assets/lob/Life.png";
+const imgCar      = "./assets/lob/Car.png";
+const imgHospital = "./assets/lob/Hospital.png";
+const imgBike     = "./assets/lob/Bike.png";
+const imgTravel   = "./assets/lob/Travel.png";
+const imgLife     = "./assets/lob/Life.png";
 
 // ─── Quick Access Card ────────────────────────────────────────────────────────
 function QuickCard({ icon, label }: { icon: string; label: string }) {
