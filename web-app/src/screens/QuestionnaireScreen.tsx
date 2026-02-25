@@ -1,676 +1,632 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState } from "react";
 
-/* ───────────────────────── Types ──────────────────────── */
+/* ─── Exported types ─── */
 
-export interface QuestionOption {
-  id: string;
-  label: string;
+export interface QuizMember {
+  name: string;
+  role: string;
+  age: number;
+  color: string;
+  init: string;
 }
 
-export interface FollowUp {
-  showIfAnswer: string;
-  question: string;
-  options: QuestionOption[];
+export interface QuizState {
+  family: { me: boolean; spouse: boolean; children: boolean; parents: boolean };
+  childrenCount: number;
+  parentsCount: number;
+  dependents: string[];
+  members: QuizMember[];
+  conditions: string[];
+  incomeL: number;
+  debtL: number;
+  savingsL: number;
+  hasHealthIns: boolean;
+  healthCoverL: number;
+  hasLifeIns: boolean;
+  lifeCoverL: number;
+  city: string;
 }
-
-export interface InputField {
-  id: string;
-  label: string;
-  type: "text" | "number";
-  placeholder?: string;
-  picker?: "city";
-}
-
-export interface Question {
-  id: string;
-  title: string;
-  subtitle?: string;
-  type: "checkbox" | "radio" | "input";
-  options?: QuestionOption[];
-  fields?: InputField[];
-  /** Inline follow-up that appears when a specific option is chosen */
-  followUp?: FollowUp;
-  /** For checkbox: inline number picker that appears when a specific option is toggled */
-  inlineCounter?: {
-    triggeredBy: string;
-    question: string;
-    options: QuestionOption[];
-  };
-}
-
-export type Answers = Record<string, string | string[]>;
 
 interface Props {
-  questions: Question[];
   onBack: () => void;
-  onComplete: (answers: Answers) => void;
+  onComplete: (state: QuizState) => void;
 }
 
-/* ───────────────────── Sub-components ─────────────────── */
+const MEMBER_COLORS = ["#7c5cf6", "#3b82f6", "#ec4899", "#f59e0b", "#10b981", "#ef4444"];
 
-function Checkbox({ checked }: { checked: boolean }) {
-  return (
-    <div
-      className="shrink-0 rounded-[4px] flex items-center justify-center"
-      style={{
-        width: 20,
-        height: 20,
-        border: checked ? "none" : "1.5px solid #5b5675",
-        backgroundColor: checked ? "#000000" : "transparent",
-      }}
-    >
-      {checked && (
-        <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
-          <path d="M1 5L4.5 8.5L11 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )}
-    </div>
-  );
-}
-
-function RadioButton({ checked }: { checked: boolean }) {
-  return (
-    <div
-      className="shrink-0 rounded-full flex items-center justify-center"
-      style={{
-        width: 20,
-        height: 20,
-        border: checked ? "none" : "1.5px solid #5b5675",
-        backgroundColor: checked ? "#000000" : "transparent",
-      }}
-    >
-      {checked && (
-        <div className="rounded-full bg-white" style={{ width: 8, height: 8 }} />
-      )}
-    </div>
-  );
-}
-
-function ProgressBar({ current, total }: { current: number; total: number }) {
-  const pct = ((current + 1) / total) * 100;
-  return (
-    <div className="w-full overflow-hidden rounded-[7px]" style={{ height: 8 }}>
-      <div className="relative w-full h-full" style={{ backgroundColor: "rgba(75,75,75,0.2)" }}>
-        <div
-          className="absolute left-0 top-0 h-full rounded-[40px]"
-          style={{
-            width: `${pct}%`,
-            background: "linear-gradient(90deg, rgba(57, 28, 87, 1) 0%, rgba(155, 87, 229, 1) 100%)",
-            transition: "width 0.3s ease",
-          }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function PillPicker({
-  options,
-  selected,
-  onSelect,
-}: {
-  options: QuestionOption[];
-  selected: string | undefined;
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <div className="flex gap-3 flex-wrap">
-      {options.map((opt) => {
-        const isActive = selected === opt.id;
-        return (
-          <button
-            key={opt.id}
-            onClick={() => onSelect(opt.id)}
-            className="flex items-center justify-center rounded-lg cursor-pointer"
-            style={{
-              padding: "10px 20px",
-              backgroundColor: isActive ? "#121212" : "#ffffff",
-              border: isActive ? "1.5px solid #121212" : "1px solid #e8e8e8",
-              color: isActive ? "#ffffff" : "#4b4b4b",
-              fontSize: 14,
-              lineHeight: "20px",
-              fontWeight: 500,
-              transition: "all 0.15s ease",
-            }}
-          >
-            {opt.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-/* ───────────────────── Decorative BG ──────────────────── */
-
-function HeroBg() {
-  return (
-    <div className="absolute top-0 left-0 w-full overflow-hidden" style={{ height: 216 }}>
-      <div className="absolute inset-0" style={{ backgroundColor: "#f8fdff" }} />
-      <div
-        className="absolute"
-        style={{
-          width: 180,
-          height: 230,
-          left: -54,
-          top: -31,
-          borderRadius: "50%",
-          background: "radial-gradient(ellipse at center, rgba(83,46,212,0.08) 0%, transparent 70%)",
-          transform: "rotate(-85deg)",
-        }}
-      />
-      <div
-        className="absolute"
-        style={{
-          width: 196,
-          height: 168,
-          right: -70,
-          top: -41,
-          borderRadius: "50%",
-          background: "radial-gradient(ellipse at center, rgba(83,46,212,0.06) 0%, transparent 70%)",
-          transform: "rotate(19deg)",
-        }}
-      />
-      <div
-        className="absolute bottom-0 left-0 w-full"
-        style={{
-          height: 64,
-          background: "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
-        }}
-      />
-    </div>
-  );
-}
-
-/* ───────── City picker bottom sheet ──────────────────── */
-
-const INDIAN_CITIES = [
-  "Agra", "Ahmedabad", "Ajmer", "Aligarh", "Allahabad", "Amravati", "Amritsar",
-  "Aurangabad", "Bangalore", "Bareilly", "Belgaum", "Bhilai", "Bhopal",
-  "Bhubaneswar", "Bikaner", "Chandigarh", "Chennai", "Coimbatore", "Cuttack",
-  "Dehradun", "Delhi", "Dhanbad", "Durgapur", "Erode", "Faridabad",
-  "Gandhinagar", "Ghaziabad", "Gorakhpur", "Guntur", "Gurgaon", "Guwahati",
-  "Gwalior", "Hubli", "Hyderabad", "Imphal", "Indore", "Jabalpur", "Jaipur",
-  "Jalandhar", "Jammu", "Jamshedpur", "Jhansi", "Jodhpur", "Kanpur", "Kochi",
-  "Kolhapur", "Kolkata", "Kota", "Kozhikode", "Lucknow", "Ludhiana", "Madurai",
-  "Mangalore", "Meerut", "Moradabad", "Mumbai", "Mysore", "Nagpur", "Nanded",
-  "Nashik", "Navi Mumbai", "Noida", "Patna", "Pondicherry", "Pune", "Raipur",
-  "Rajkot", "Ranchi", "Salem", "Shimla", "Siliguri", "Solapur", "Srinagar",
-  "Surat", "Thane", "Thiruvananthapuram", "Thrissur", "Tiruchirappalli",
-  "Tirupati", "Udaipur", "Ujjain", "Vadodara", "Varanasi", "Vijayawada",
-  "Visakhapatnam", "Warangal",
+const CITIES = [
+  "Mumbai", "Delhi", "Bengaluru", "Hyderabad", "Chennai",
+  "Pune", "Kolkata", "Ahmedabad", "Jaipur", "Surat",
+  "Lucknow", "Kanpur", "Nagpur", "Indore", "Bhopal",
+  "Patna", "Vadodara", "Coimbatore", "Visakhapatnam", "Gurgaon",
+  "Noida", "Chandigarh", "Kochi", "Mysuru", "Bhubaneswar",
 ];
 
-function CityPickerSheet({
-  open,
-  selected,
-  onSelect,
-  onClose,
-}: {
-  open: boolean;
-  selected: string;
-  onSelect: (city: string) => void;
-  onClose: () => void;
-}) {
-  const [search, setSearch] = useState("");
-  const searchRef = useRef<HTMLInputElement>(null);
-  const [visible, setVisible] = useState(false);
+function formatL(l: number): string {
+  if (l <= 0) return "None";
+  if (l >= 100) return `₹${(l / 100).toFixed(1)} Cr`;
+  return `₹${l % 1 === 0 ? l : l.toFixed(1)}L`;
+}
 
-  useEffect(() => {
-    if (open) {
-      requestAnimationFrame(() => setVisible(true));
-      setTimeout(() => searchRef.current?.focus(), 320);
-    } else {
-      setVisible(false);
-    }
-  }, [open]);
+/* ─── Shared UI pieces ─── */
 
-  useEffect(() => {
-    if (!open) setSearch("");
-  }, [open]);
-
-  if (!open && !visible) return null;
-
-  const filtered = search.trim()
-    ? INDIAN_CITIES.filter((c) => c.toLowerCase().includes(search.toLowerCase()))
-    : INDIAN_CITIES;
-
-  const handleClose = () => {
-    setVisible(false);
-    setTimeout(onClose, 280);
-  };
-
+function QHeader({ step, total, label, onBack }: { step: number; total: number; label: string; onBack: () => void }) {
+  const pct = (step / total) * 100;
   return (
-    <div
-      className="absolute inset-0 z-50 flex flex-col justify-end"
-      style={{ backgroundColor: visible ? "rgba(0,0,0,0.35)" : "transparent", transition: "background-color 0.28s ease" }}
-      onClick={handleClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="flex flex-col"
-        style={{
-          backgroundColor: "#ffffff",
-          borderRadius: "20px 20px 0 0",
-          maxHeight: "70%",
-          transform: visible ? "translateY(0)" : "translateY(100%)",
-          transition: "transform 0.28s cubic-bezier(0.32, 0.72, 0, 1)",
-        }}
-      >
-        {/* Handle bar */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: "#e0e0e0" }} />
+    <div style={{ background: "#fff", paddingBottom: 20 }}>
+      <div style={{ padding: "16px 22px 0", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, fontWeight: 600, color: "#000" }}>
+        <span>11:38</span><span style={{ color: "#8e8e93" }}>{step} of {total}</span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", padding: "8px 20px 0", gap: 12 }}>
+        <button onClick={onBack} style={{ width: 36, height: 36, borderRadius: "50%", border: "1.5px solid #e5e5ea", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, cursor: "pointer", color: "#000", background: "#fff", fontFamily: "inherit" }}>‹</button>
+        <div style={{ fontSize: 15, fontWeight: 600, color: "#000" }}>Risk Check</div>
+      </div>
+      <div style={{ padding: "14px 22px 0" }}>
+        <div style={{ height: 4, background: "#f2f2f7", borderRadius: 10, overflow: "hidden" }}>
+          <div style={{ height: "100%", background: "linear-gradient(90deg,#7c5cf6,#a78bfa)", borderRadius: 10, width: `${pct}%`, transition: "width 0.5s cubic-bezier(0.4,0,0.2,1)" }} />
         </div>
-
-        {/* Title */}
-        <p className="font-semibold px-5 pt-2 pb-3" style={{ fontSize: 18, lineHeight: "24px", color: "#121212" }}>
-          Select your city
-        </p>
-
-        {/* Search */}
-        <div className="px-5 pb-3">
-          <div
-            className="flex items-center gap-2 rounded-[10px]"
-            style={{ padding: "10px 14px", backgroundColor: "#f5f5f5" }}
-          >
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-              <circle cx="9" cy="9" r="6.5" stroke="#999" strokeWidth="1.5" />
-              <path d="M14 14L18 18" stroke="#999" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            <input
-              ref={searchRef}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search city..."
-              className="w-full outline-none bg-transparent"
-              style={{ fontSize: 15, lineHeight: "20px", color: "#121212" }}
-            />
-            {search && (
-              <button onClick={() => setSearch("")} className="shrink-0 cursor-pointer" style={{ color: "#999", fontSize: 18, lineHeight: 1 }}>
-                &times;
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* City list */}
-        <div className="overflow-y-auto flex-1 pb-8" style={{ WebkitOverflowScrolling: "touch" }}>
-          {filtered.length === 0 ? (
-            <p className="px-5 py-6 text-center" style={{ fontSize: 14, color: "#999" }}>
-              No cities found
-            </p>
-          ) : (
-            filtered.map((city) => {
-              const isSelected = city === selected;
-              return (
-                <button
-                  key={city}
-                  onClick={() => { onSelect(city); handleClose(); }}
-                  className="flex items-center justify-between w-full px-5 cursor-pointer"
-                  style={{
-                    padding: "14px 20px",
-                    backgroundColor: isSelected ? "#f7f7f7" : "transparent",
-                    borderBottom: "1px solid #f2f2f2",
-                  }}
-                >
-                  <span style={{ fontSize: 15, lineHeight: "22px", color: isSelected ? "#121212" : "#4b4b4b", fontWeight: isSelected ? 600 : 400 }}>
-                    {city}
-                  </span>
-                  {isSelected && (
-                    <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
-                      <path d="M1 6L5.5 10.5L15 1" stroke="#121212" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </button>
-              );
-            })
-          )}
-        </div>
+        <div style={{ fontSize: 12, color: "#8e8e93", marginTop: 6, fontWeight: 500 }}>{label}</div>
       </div>
     </div>
   );
 }
 
-/* ───────── Question renderers ─────────────────────────── */
-
-function InputQuestion({
-  question,
-  values,
-  onChange,
-}: {
-  question: Question;
-  values: Record<string, string>;
-  onChange: (fieldId: string, value: string) => void;
-}) {
-  const [citySheetOpen, setCitySheetOpen] = useState(false);
-  const cityField = question.fields?.find((f) => f.picker === "city");
-
+function StickyCTA({ label, disabled, onClick, showSkip, onSkip }: { label: string; disabled?: boolean; onClick: () => void; showSkip?: boolean; onSkip?: () => void }) {
   return (
-    <div className="flex flex-col gap-5 mt-7">
-      {question.fields?.map((field) => {
-        const hasValue = (values[field.id] || "").trim().length > 0;
-
-        if (field.picker === "city") {
-          return (
-            <div key={field.id} className="flex flex-col gap-2">
-              <label style={{ fontSize: 14, lineHeight: "20px", color: "#7a787d", fontWeight: 500 }}>
-                {field.label}
-              </label>
-              <button
-                onClick={() => setCitySheetOpen(true)}
-                className="w-full rounded-[12px] text-left cursor-pointer flex items-center justify-between"
-                style={{
-                  padding: "16px 20px",
-                  fontSize: 16,
-                  lineHeight: "24px",
-                  color: hasValue ? "#121212" : "#9ca3af",
-                  border: hasValue ? "1px solid #121212" : "1px solid #e8e8e8",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <span>{hasValue ? values[field.id] : field.placeholder || "Select city"}</span>
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className="shrink-0" style={{ opacity: 0.4 }}>
-                  <path d="M1 1L5 5L9 1" stroke="#121212" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </div>
-          );
-        }
-
-        return (
-          <div key={field.id} className="flex flex-col gap-2">
-            <label
-              style={{ fontSize: 14, lineHeight: "20px", color: "#7a787d", fontWeight: 500 }}
-            >
-              {field.label}
-            </label>
-            <input
-              type={field.type}
-              placeholder={field.placeholder}
-              value={values[field.id] || ""}
-              onChange={(e) => onChange(field.id, e.target.value)}
-              className="w-full rounded-[12px] outline-none"
-              style={{
-                padding: "16px 20px",
-                fontSize: 16,
-                lineHeight: "24px",
-                color: "#121212",
-                border: hasValue ? "1px solid #121212" : "1px solid #e8e8e8",
-                backgroundColor: "#ffffff",
-              }}
-            />
-          </div>
-        );
-      })}
-
-      {cityField && (
-        <CityPickerSheet
-          open={citySheetOpen}
-          selected={values[cityField.id] || ""}
-          onSelect={(city) => onChange(cityField.id, city)}
-          onClose={() => setCitySheetOpen(false)}
-        />
+    <div style={{ position: "sticky", bottom: 0, background: "linear-gradient(to top, #f2f2f7 70%, transparent)", padding: "16px 22px 32px" }}>
+      <button onClick={onClick} disabled={disabled} style={{
+        width: "100%", padding: 17, background: disabled ? "#d1d1d6" : "#7c5cf6", color: disabled ? "#8e8e93" : "#fff",
+        fontSize: 16, fontWeight: 800, letterSpacing: -0.2, border: "none", borderRadius: 16, cursor: disabled ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "opacity 0.15s",
+      }}>{label}</button>
+      {showSkip && (
+        <button onClick={onSkip} style={{ width: "100%", padding: 10, background: "transparent", color: "#8e8e93", fontSize: 14, fontWeight: 500, border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 8 }}>
+          Skip for now
+        </button>
       )}
     </div>
   );
 }
 
-function OptionsQuestion({
-  question,
-  selected,
-  onToggle,
-  counterValue,
-  onCounterChange,
-  followUpValue,
-  onFollowUpChange,
-}: {
-  question: Question;
-  selected: string[];
-  onToggle: (id: string) => void;
-  counterValue?: string;
-  onCounterChange?: (id: string) => void;
-  followUpValue?: string;
-  onFollowUpChange?: (id: string) => void;
-}) {
-  const isRadio = question.type === "radio";
-  const showCounter =
-    question.inlineCounter && selected.includes(question.inlineCounter.triggeredBy);
-  const showFollowUp =
-    question.followUp && selected.includes(question.followUp.showIfAnswer);
-
+function WhyBox({ text }: { text: string }) {
   return (
-    <div className="flex flex-col gap-4 mt-7">
-      {question.options?.map((opt) => {
-        const isSelected = selected.includes(opt.id);
-        const counterLabel =
-          opt.id === question.inlineCounter?.triggeredBy && counterValue
-            ? ` (${counterValue})`
-            : "";
-
-        return (
-          <div key={opt.id} className="flex flex-col gap-3">
-            <button
-              onClick={() => onToggle(opt.id)}
-              className="flex items-center justify-between rounded-[12px] w-full text-left cursor-pointer"
-              style={{
-                padding: "16px 20px",
-                backgroundColor: "#ffffff",
-                border: isSelected ? "1px solid #121212" : "1px solid #e8e8e8",
-              }}
-            >
-              <span style={{ fontSize: 16, lineHeight: "24px", color: isSelected ? "#121212" : "#4b4b4b" }}>
-                {opt.label}{counterLabel}
-              </span>
-              {isRadio ? <RadioButton checked={isSelected} /> : <Checkbox checked={isSelected} />}
-            </button>
-
-            {/* Inline children counter */}
-            {opt.id === question.inlineCounter?.triggeredBy && showCounter && (
-              <div className="flex flex-col gap-2 pl-2 pb-1">
-                <p style={{ fontSize: 14, lineHeight: "20px", color: "#4b4b4b", fontWeight: 500 }}>
-                  {question.inlineCounter!.question}
-                </p>
-                <PillPicker
-                  options={question.inlineCounter!.options}
-                  selected={counterValue}
-                  onSelect={(id) => onCounterChange?.(id)}
-                />
-              </div>
-            )}
-          </div>
-        );
-      })}
-
-      {/* Follow-up sub-question (health/life coverage) */}
-      {showFollowUp && question.followUp && (
-        <div className="flex flex-col gap-3 mt-2 pt-4" style={{ borderTop: "1px solid #f0f0f0" }}>
-          <p className="font-medium" style={{ fontSize: 16, lineHeight: "24px", color: "#121212" }}>
-            {question.followUp.question}
-          </p>
-          <PillPicker
-            options={question.followUp.options}
-            selected={followUpValue}
-            onSelect={(id) => onFollowUpChange?.(id)}
-          />
-        </div>
-      )}
+    <div style={{ background: "#f8f8fa", borderRadius: 14, padding: "14px 16px", display: "flex", gap: 10, alignItems: "flex-start", marginTop: 16 }}>
+      <div style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>💡</div>
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#000", marginBottom: 2, textTransform: "uppercase", letterSpacing: "0.04em" }}>Why we ask</div>
+        <div style={{ fontSize: 13, color: "#8e8e93", lineHeight: 1.5 }}>{text}</div>
+      </div>
     </div>
   );
 }
 
-/* ───────────────────── Main Component ─────────────────── */
+/* ─── Main component ─── */
 
-export default function QuestionnaireScreen({ questions, onBack, onComplete }: Props) {
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Answers>({});
+export default function QuestionnaireScreen({ onBack, onComplete }: Props) {
+  const [step, setStep] = useState(1);
 
-  const question = questions[step];
-  const isLast = step === questions.length - 1;
+  /* Q1 – family members */
+  const [famSpouse,   setFamSpouse]   = useState(false);
+  const [famChildren, setFamChildren] = useState(false);
+  const [famParents,  setFamParents]  = useState(false);
+  const [childCount,  setChildCount]  = useState(1);
+  const [parentCount, setParentCount] = useState(2);
 
-  /* ── Derived state per question type ─── */
+  /* Q2 – dependents */
+  const [dependents, setDependents] = useState<string[]>([]);
 
-  const selectedOptions = (
-    question.type === "checkbox" || question.type === "radio"
-      ? (answers[question.id] as string[] | undefined) || []
-      : []
-  );
+  /* Q3 – ages (stored as [age, ...]) indexed by member key */
+  const [memberAges, setMemberAges] = useState<Record<string, number>>({
+    me: 34, spouse: 31, "child-0": 8, "child-1": 8, "child-2": 8,
+    "parent-0": 62, "parent-1": 62, "parent-2": 62, "parent-3": 62,
+  });
 
-  const inputValues: Record<string, string> =
-    question.type === "input"
-      ? (question.fields || []).reduce((acc, f) => {
-          acc[f.id] = (answers[`${question.id}.${f.id}`] as string) || "";
-          return acc;
-        }, {} as Record<string, string>)
-      : {};
+  /* Q4 – health conditions */
+  const [conditions, setConditions] = useState<string[]>([]);
 
-  const counterKey = `${question.id}.__counter`;
-  const counterValue = (answers[counterKey] as string) || undefined;
+  /* Q5 – income */
+  const [incomeSlider, setIncomeSlider] = useState(12);
 
-  const followUpKey = `${question.id}.__followUp`;
-  const followUpValue = (answers[followUpKey] as string) || undefined;
+  /* Q6 – debt */
+  const [debtSlider, setDebtSlider] = useState(30);
 
-  /* ── Can continue? ─── */
+  /* Q7 – savings */
+  const [savingsSlider, setSavingsSlider] = useState(10);
 
-  let canContinue = false;
-  if (question.type === "input") {
-    canContinue = (question.fields || []).every(
-      (f) => ((answers[`${question.id}.${f.id}`] as string) || "").trim().length > 0,
-    );
-  } else {
-    canContinue = selectedOptions.length > 0;
-    if (question.inlineCounter && selectedOptions.includes(question.inlineCounter.triggeredBy)) {
-      canContinue = canContinue && !!counterValue;
+  /* Q8 – health insurance */
+  const [hasHealthIns,    setHasHealthIns]    = useState(true);
+  const [healthCoverSlider, setHealthCoverSlider] = useState(5);
+
+  /* Q9 – life insurance */
+  const [hasLifeIns,    setHasLifeIns]    = useState(false);
+  const [lifeCoverSlider, setLifeCoverSlider] = useState(50);
+
+  /* Q10 – city */
+  const [city, setCity] = useState("");
+  const [cityInput, setCityInput] = useState("");
+
+  /* ─── Derived values ─── */
+
+  function getMemberList(): QuizMember[] {
+    const list: QuizMember[] = [];
+    list.push({ name: "You", role: "Primary earner", age: memberAges["me"] ?? 34, color: MEMBER_COLORS[0], init: "Me" });
+    if (famSpouse)   list.push({ name: "Spouse", role: "Spouse", age: memberAges["spouse"] ?? 31, color: MEMBER_COLORS[1], init: "SP" });
+    for (let i = 0; i < childCount && famChildren; i++) {
+      list.push({ name: `Child ${i + 1}`, role: "Child", age: memberAges[`child-${i}`] ?? 8, color: MEMBER_COLORS[4], init: `C${i + 1}` });
     }
-    if (question.followUp && selectedOptions.includes(question.followUp.showIfAnswer)) {
-      canContinue = canContinue && !!followUpValue;
+    for (let i = 0; i < parentCount && famParents; i++) {
+      list.push({ name: `Parent ${i + 1}`, role: "Parent", age: memberAges[`parent-${i}`] ?? 62, color: MEMBER_COLORS[2], init: `P${i + 1}` });
     }
+    return list;
   }
 
-  /* ── Handlers ─── */
+  function incomeL(): number {
+    const v = incomeSlider;
+    return v <= 10 ? v * 0.1 : v / 10;
+  }
 
-  const toggleOption = useCallback(
-    (optionId: string) => {
-      setAnswers((prev) => {
-        const current = (prev[question.id] as string[] | undefined) || [];
-        if (question.type === "radio") {
-          const cleared = { ...prev, [question.id]: [optionId] };
-          if (question.followUp && optionId !== question.followUp.showIfAnswer) {
-            delete cleared[followUpKey];
-          }
-          return cleared;
-        }
-        const next = current.includes(optionId)
-          ? current.filter((id) => id !== optionId)
-          : [...current, optionId];
-        const updated = { ...prev, [question.id]: next };
-        if (question.inlineCounter && optionId === question.inlineCounter.triggeredBy && current.includes(optionId)) {
-          delete updated[counterKey];
-        }
-        return updated;
+  function debtL(): number {
+    if (debtSlider === 0) return 0;
+    return debtSlider <= 50 ? debtSlider : 50 + (debtSlider - 50) * 3;
+  }
+
+  function savingsL(): number {
+    if (savingsSlider === 0) return 0;
+    const v = savingsSlider;
+    return Math.round((v <= 50 ? v * 0.5 : 25 + (v - 50) * 1.5) * 2) / 2;
+  }
+
+  function healthCoverL(): number {
+    const v = healthCoverSlider;
+    return v <= 20 ? v : 20 + (v - 20) * 4;
+  }
+
+  function formatIncome(): string {
+    const l = incomeL();
+    return l < 1 ? `₹${Math.round(l * 100)}K` : `₹${l.toFixed(1)}L`;
+  }
+
+  /* ─── Navigation ─── */
+
+  function handleBack() {
+    if (step === 1) onBack();
+    else setStep(s => s - 1);
+  }
+
+  function advance() { setStep(s => s + 1); }
+
+  function handleComplete() {
+    const members = getMemberList();
+    onComplete({
+      family: { me: true, spouse: famSpouse, children: famChildren, parents: famParents },
+      childrenCount: childCount,
+      parentsCount: parentCount,
+      dependents,
+      members,
+      conditions,
+      incomeL: incomeL(),
+      debtL: debtL(),
+      savingsL: savingsL(),
+      hasHealthIns,
+      healthCoverL: hasHealthIns ? healthCoverL() : 0,
+      hasLifeIns,
+      lifeCoverL: hasLifeIns ? lifeCoverSlider : 0,
+      city,
+    });
+  }
+
+  /* ─── Counter widget ─── */
+  function Counter({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (v: number) => void }) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", background: "#f2f2f7", borderRadius: 10, overflow: "hidden" }}>
+        <button onClick={() => onChange(Math.max(min, value - 1))} style={{ width: 34, height: 34, background: "transparent", border: "none", fontSize: 20, color: "#000", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>−</button>
+        <div style={{ width: 32, textAlign: "center", fontSize: 16, fontWeight: 700, color: "#000" }}>{value}</div>
+        <button onClick={() => onChange(Math.min(max, value + 1))} style={{ width: 34, height: 34, background: "transparent", border: "none", fontSize: 20, color: "#000", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>+</button>
+      </div>
+    );
+  }
+
+  /* ─── Steps ─── */
+
+  /* Q1 — Who's in your family */
+  if (step === 1) {
+    const blocks = [
+      { id: "me",       icon: "🧑",    label: "Me",         selected: true,       disabled: true,    onToggle: () => {} },
+      { id: "spouse",   icon: "💑",    label: "Spouse",     selected: famSpouse,   disabled: false,   onToggle: () => setFamSpouse(v => !v) },
+      { id: "children", icon: "👶",    label: "Children",   selected: famChildren, disabled: false,   onToggle: () => setFamChildren(v => !v) },
+      { id: "parents",  icon: "👴👵",  label: "Parents",    selected: famParents,  disabled: false,   onToggle: () => setFamParents(v => !v) },
+    ];
+    return (
+      <div className="flex flex-col h-full" style={{ background: "#f2f2f7" }}>
+        <QHeader step={1} total={10} label="Who's in your family?" onBack={handleBack} />
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: "22px 22px 0" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#000", letterSpacing: -0.4, lineHeight: 1.2, marginBottom: 8 }}>Who's in your family?</div>
+          <div style={{ fontSize: 14, color: "#8e8e93", lineHeight: 1.55, marginBottom: 22 }}>Select everyone you'd want financially protected.</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 8 }}>
+            {blocks.map(b => (
+              <div key={b.id} onClick={b.disabled ? undefined : b.onToggle} style={{
+                background: b.selected ? "#ede9fe" : "#fff",
+                border: `2px solid ${b.selected ? "#7c5cf6" : "#e5e5ea"}`,
+                borderRadius: 16, padding: "16px 14px", cursor: b.disabled ? "default" : "pointer",
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+                position: "relative", opacity: b.disabled ? 0.8 : 1, transition: "all 0.2s",
+              }}>
+                {b.selected && <div style={{ position: "absolute", top: 8, right: 8, width: 18, height: 18, borderRadius: "50%", background: "#7c5cf6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff" }}>✓</div>}
+                <div style={{ fontSize: 28, lineHeight: 1 }}>{b.icon}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: b.selected ? "#7c5cf6" : "#000", textAlign: "center" }}>{b.label}</div>
+              </div>
+            ))}
+          </div>
+          {famChildren && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fff", borderRadius: 14, border: "1.5px solid #e5e5ea", padding: "10px 14px", marginTop: -2 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#000" }}>👶 Number of children</div>
+              <Counter value={childCount} min={1} max={6} onChange={setChildCount} />
+            </div>
+          )}
+          {famParents && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fff", borderRadius: 14, border: "1.5px solid #e5e5ea", padding: "10px 14px", marginTop: 8 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#000" }}>👴 Number of parents</div>
+              <Counter value={parentCount} min={1} max={4} onChange={setParentCount} />
+            </div>
+          )}
+          <WhyBox text="Each member adds to your total hospitalisation exposure. More members = more risk surface." />
+          <div style={{ height: 120 }} />
+        </div>
+        <StickyCTA label="Continue →" onClick={advance} />
+      </div>
+    );
+  }
+
+  /* Q2 — Who depends on your income */
+  if (step === 2) {
+    const items: { type: string; icon: string; name: string; sub: string }[] = [];
+    if (famSpouse)   items.push({ type: "spouse",   icon: "💑", name: "Spouse / Partner",         sub: "No independent income" });
+    if (famChildren) items.push({ type: "children", icon: "👶", name: `Children (${childCount})`, sub: "Still studying / under 25" });
+    if (famParents)  items.push({ type: "parents",  icon: "👴", name: `Parents (${parentCount})`, sub: "Financially reliant on you" });
+
+    function toggleDep(type: string) {
+      setDependents(prev => prev.includes(type) ? prev.filter(d => d !== type) : [...prev, type]);
+    }
+
+    return (
+      <div className="flex flex-col h-full" style={{ background: "#f2f2f7" }}>
+        <QHeader step={2} total={10} label="Financial dependents" onBack={handleBack} />
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: "22px 22px 0" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#000", letterSpacing: -0.4, lineHeight: 1.2, marginBottom: 8 }}>Who depends on your income?</div>
+          <div style={{ fontSize: 14, color: "#8e8e93", lineHeight: 1.55, marginBottom: 22 }}>Select members who'd face hardship if your income stopped tomorrow.</div>
+          {items.length === 0 ? (
+            <div style={{ padding: 20, textAlign: "center", color: "#8e8e93", fontSize: 14 }}>No other family members selected.</div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {items.map(it => {
+                const sel = dependents.includes(it.type);
+                return (
+                  <div key={it.type} onClick={() => toggleDep(it.type)} style={{
+                    background: sel ? "#ede9fe" : "#fff", border: `2px solid ${sel ? "#7c5cf6" : "#e5e5ea"}`,
+                    borderRadius: 14, padding: "14px 16px", cursor: "pointer",
+                    display: "flex", alignItems: "center", gap: 12, transition: "all 0.2s",
+                  }}>
+                    <div style={{ fontSize: 22, flexShrink: 0 }}>{it.icon}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: sel ? "#7c5cf6" : "#000" }}>{it.name}</div>
+                      <div style={{ fontSize: 12, color: "#8e8e93", marginTop: 1 }}>{it.sub}</div>
+                    </div>
+                    <div style={{ width: 22, height: 22, borderRadius: "50%", border: `2px solid ${sel ? "#7c5cf6" : "#e5e5ea"}`, background: sel ? "#7c5cf6" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", transition: "all 0.2s" }}>
+                      {sel ? "✓" : ""}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          <WhyBox text="Dependents determine your life insurance need. More dependents = higher cover requirement." />
+          <div style={{ height: 120 }} />
+        </div>
+        <StickyCTA label="Continue →" onClick={advance} />
+      </div>
+    );
+  }
+
+  /* Q3 — Ages */
+  if (step === 3) {
+    const members = getMemberList();
+    function adjAge(key: string, d: number) {
+      setMemberAges(prev => ({ ...prev, [key]: Math.max(0, Math.min(99, (prev[key] ?? 30) + d)) }));
+    }
+    const memberKeys = ["me", ...Array.from({ length: childCount }, (_, i) => `child-${i}`).filter(() => famChildren), ...Array.from({ length: parentCount }, (_, i) => `parent-${i}`).filter(() => famParents)];
+    if (famSpouse) memberKeys.splice(1, 0, "spouse");
+
+    return (
+      <div className="flex flex-col h-full" style={{ background: "#f2f2f7" }}>
+        <QHeader step={3} total={10} label="Member ages" onBack={handleBack} />
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: "22px 22px 0" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#000", letterSpacing: -0.4, lineHeight: 1.2, marginBottom: 8 }}>How old are your family members?</div>
+          <div style={{ fontSize: 14, color: "#8e8e93", lineHeight: 1.55, marginBottom: 22 }}>Age is the single biggest driver of hospitalisation cost.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {members.map((m, idx) => {
+              const key = memberKeys[idx] ?? `m-${idx}`;
+              return (
+                <div key={key} style={{ background: "#fff", borderRadius: 16, border: "1.5px solid #e5e5ea", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: "50%", background: m.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{m.init}</div>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "#000" }}>{m.name}</div>
+                      <div style={{ fontSize: 12, color: "#8e8e93" }}>{m.role}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", background: "#f2f2f7", borderRadius: 12, overflow: "hidden" }}>
+                    <button onClick={() => adjAge(key, -1)} style={{ width: 38, height: 38, background: "transparent", border: "none", fontSize: 20, color: "#000", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>−</button>
+                    <div style={{ width: 42, textAlign: "center", fontSize: 17, fontWeight: 700, color: "#000" }}>{memberAges[key] ?? 30}</div>
+                    <button onClick={() => adjAge(key, 1)} style={{ width: 38, height: 38, background: "transparent", border: "none", fontSize: 20, color: "#000", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>+</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <WhyBox text="A 65-year-old parent costs ~8× more to hospitalise than a 30-year-old. Ages shape your entire risk profile." />
+          <div style={{ height: 120 }} />
+        </div>
+        <StickyCTA label="Continue →" onClick={advance} />
+      </div>
+    );
+  }
+
+  /* Q4 — Health conditions */
+  if (step === 4) {
+    const chips = [
+      { id: "diabetes",    icon: "🩸",    label: "Diabetes" },
+      { id: "heart",       icon: "❤️",    label: "Heart disease / hypertension" },
+      { id: "cancer",      icon: "🔬",    label: "Cancer history" },
+      { id: "kidney",      icon: "🫁",    label: "Kidney / liver disease" },
+      { id: "ortho",       icon: "🦴",    label: "Orthopaedic / joint issues" },
+      { id: "respiratory", icon: "😮‍💨",  label: "Asthma / respiratory" },
+      { id: "mental",      icon: "🧠",    label: "Mental health condition" },
+    ];
+    function toggleChip(id: string) {
+      setConditions(prev => {
+        const cleaned = prev.filter(c => c !== "none");
+        return cleaned.includes(id) ? cleaned.filter(c => c !== id) : [...cleaned, id];
       });
-    },
-    [question.id, question.type, question.followUp, question.inlineCounter, counterKey, followUpKey],
-  );
-
-  const handleInputChange = useCallback(
-    (fieldId: string, value: string) => {
-      setAnswers((prev) => ({ ...prev, [`${question.id}.${fieldId}`]: value }));
-    },
-    [question.id],
-  );
-
-  const handleCounterChange = useCallback(
-    (id: string) => {
-      setAnswers((prev) => ({ ...prev, [counterKey]: id }));
-    },
-    [counterKey],
-  );
-
-  const handleFollowUpChange = useCallback(
-    (id: string) => {
-      setAnswers((prev) => ({ ...prev, [followUpKey]: id }));
-    },
-    [followUpKey],
-  );
-
-  const handleContinue = () => {
-    if (!canContinue) return;
-    if (isLast) {
-      onComplete(answers);
-    } else {
-      setStep((s) => s + 1);
     }
-  };
-
-  const handleBack = () => {
-    if (step > 0) {
-      setStep((s) => s - 1);
-    } else {
-      onBack();
+    function toggleNone() {
+      setConditions(["none"]);
     }
-  };
+    const hasNone = conditions.includes("none");
+
+    return (
+      <div className="flex flex-col h-full" style={{ background: "#f2f2f7" }}>
+        <QHeader step={4} total={10} label="Health conditions" onBack={handleBack} />
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: "22px 22px 0" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#000", letterSpacing: -0.4, lineHeight: 1.2, marginBottom: 8 }}>Any significant health conditions?</div>
+          <div style={{ fontSize: 14, color: "#8e8e93", lineHeight: 1.55, marginBottom: 22 }}>Select all that apply across any member.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {chips.map(c => {
+              const sel = conditions.includes(c.id);
+              return (
+                <div key={c.id} onClick={() => toggleChip(c.id)} style={{
+                  background: sel ? "#fef2f2" : "#fff", border: `2px solid ${sel ? "#ef4444" : "#e5e5ea"}`,
+                  borderRadius: 14, padding: "13px 16px", cursor: "pointer",
+                  display: "flex", alignItems: "center", gap: 12, transition: "all 0.2s",
+                }}>
+                  <div style={{ fontSize: 20, flexShrink: 0 }}>{c.icon}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: sel ? "#dc2626" : "#000", flex: 1 }}>{c.label}</div>
+                  <div style={{ width: 20, height: 20, borderRadius: "50%", border: `2px solid ${sel ? "#ef4444" : "#e5e5ea"}`, background: sel ? "#ef4444" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", transition: "all 0.2s" }}>
+                    {sel ? "✓" : ""}
+                  </div>
+                </div>
+              );
+            })}
+            <div onClick={toggleNone} style={{
+              background: hasNone ? "#ecfdf5" : "#f2f2f7", borderRadius: 14,
+              padding: "13px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
+              border: `2px solid ${hasNone ? "#0d9488" : "transparent"}`, marginTop: 4, transition: "all 0.2s",
+            }}>
+              <div style={{ fontSize: 20 }}>✅</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: hasNone ? "#0d9488" : "#8e8e93" }}>None — everyone's in good health</div>
+            </div>
+          </div>
+          <WhyBox text="Chronic conditions increase hospitalisation likelihood by 2–4×, raising your family's expected annual medical cost." />
+          <div style={{ height: 120 }} />
+        </div>
+        <StickyCTA label="Continue →" onClick={advance} disabled={conditions.length === 0} />
+      </div>
+    );
+  }
+
+  /* Q5 — Monthly income */
+  if (step === 5) {
+    return (
+      <div className="flex flex-col h-full" style={{ background: "#f2f2f7" }}>
+        <QHeader step={5} total={10} label="Household income" onBack={handleBack} />
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: "22px 22px 0" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#000", letterSpacing: -0.4, lineHeight: 1.2, marginBottom: 8 }}>Total household monthly income?</div>
+          <div style={{ fontSize: 14, color: "#8e8e93", lineHeight: 1.55, marginBottom: 22 }}>Combined income of all earning members.</div>
+          <div style={{ fontSize: 38, fontWeight: 900, color: "#000", letterSpacing: -1.5, lineHeight: 1, marginBottom: 6 }}>{formatIncome()}</div>
+          <div style={{ fontSize: 13, color: "#8e8e93", marginBottom: 18 }}>per month</div>
+          <div style={{ marginBottom: 8 }}>
+            <input type="range" min={1} max={60} value={incomeSlider} onChange={e => setIncomeSlider(Number(e.target.value))}
+              style={{ width: "100%" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#8e8e93", fontWeight: 500, marginTop: 6 }}>
+              <span>₹10K</span><span>₹6L+</span>
+            </div>
+          </div>
+          <WhyBox text="Your income determines what your family would need to maintain their lifestyle. Life cover = ~10–15× annual income." />
+          <div style={{ height: 120 }} />
+        </div>
+        <StickyCTA label="Continue →" onClick={advance} />
+      </div>
+    );
+  }
+
+  /* Q6 — Total debt */
+  if (step === 6) {
+    const dl = debtL();
+    const display = dl === 0 ? "None" : formatL(dl);
+    return (
+      <div className="flex flex-col h-full" style={{ background: "#f2f2f7" }}>
+        <QHeader step={6} total={10} label="Debts & EMIs" onBack={handleBack} />
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: "22px 22px 0" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#000", letterSpacing: -0.4, lineHeight: 1.2, marginBottom: 8 }}>Total outstanding loans & EMIs?</div>
+          <div style={{ fontSize: 14, color: "#8e8e93", lineHeight: 1.55, marginBottom: 22 }}>Include home loan, car loan, personal loans.</div>
+          <div style={{ fontSize: 38, fontWeight: 900, color: "#000", letterSpacing: -1.5, lineHeight: 1, marginBottom: 6 }}>{display}</div>
+          <div style={{ fontSize: 13, color: "#8e8e93", marginBottom: 18 }}>outstanding principal</div>
+          <div style={{ marginBottom: 8 }}>
+            <input type="range" min={0} max={100} value={debtSlider} onChange={e => setDebtSlider(Number(e.target.value))} style={{ width: "100%" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#8e8e93", fontWeight: 500, marginTop: 6 }}>
+              <span>None</span><span>₹2Cr+</span>
+            </div>
+          </div>
+          <WhyBox text="Outstanding debt passes to your family if something happens to you. Life cover must be enough to clear debts AND replace income." />
+          <div style={{ height: 120 }} />
+        </div>
+        <StickyCTA label="Continue →" onClick={advance} />
+      </div>
+    );
+  }
+
+  /* Q7 — Liquid savings */
+  if (step === 7) {
+    const sl = savingsL();
+    const display = sl === 0 ? "None" : formatL(sl);
+    return (
+      <div className="flex flex-col h-full" style={{ background: "#f2f2f7" }}>
+        <QHeader step={7} total={10} label="Emergency savings" onBack={handleBack} />
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: "22px 22px 0" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#000", letterSpacing: -0.4, lineHeight: 1.2, marginBottom: 8 }}>How much can you deploy in a medical emergency?</div>
+          <div style={{ fontSize: 14, color: "#8e8e93", lineHeight: 1.55, marginBottom: 22 }}>Liquid savings accessible within a week.</div>
+          <div style={{ fontSize: 38, fontWeight: 900, color: "#000", letterSpacing: -1.5, lineHeight: 1, marginBottom: 6 }}>{display}</div>
+          <div style={{ fontSize: 13, color: "#8e8e93", marginBottom: 18 }}>accessible within 1 week</div>
+          <div style={{ marginBottom: 8 }}>
+            <input type="range" min={0} max={80} value={savingsSlider} onChange={e => setSavingsSlider(Number(e.target.value))} style={{ width: "100%" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#8e8e93", fontWeight: 500, marginTop: 6 }}>
+              <span>None</span><span>₹1Cr+</span>
+            </div>
+          </div>
+          <WhyBox text="Your savings act as a buffer. If savings can cover a hospitalisation, your insurance gap is smaller. If not, it's a real risk." />
+          <div style={{ height: 120 }} />
+        </div>
+        <StickyCTA label="Continue →" onClick={advance} />
+      </div>
+    );
+  }
+
+  /* Q8 — Health insurance */
+  if (step === 8) {
+    const coverDisplay = formatL(healthCoverL());
+    return (
+      <div className="flex flex-col h-full" style={{ background: "#f2f2f7" }}>
+        <QHeader step={8} total={10} label="Health insurance" onBack={handleBack} />
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: "22px 22px 0" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#000", letterSpacing: -0.4, lineHeight: 1.2, marginBottom: 8 }}>Do you have health insurance?</div>
+          <div style={{ fontSize: 14, color: "#8e8e93", lineHeight: 1.55, marginBottom: 22 }}>Include personal policy, employer group cover, or government schemes.</div>
+          <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+            {[{ val: true, label: "Yes, I do" }, { val: false, label: "No" }].map(opt => (
+              <button key={String(opt.val)} onClick={() => setHasHealthIns(opt.val)} style={{
+                flex: 1, padding: 12, borderRadius: 12, border: `2px solid ${hasHealthIns === opt.val ? "#7c5cf6" : "#e5e5ea"}`,
+                background: hasHealthIns === opt.val ? "#ede9fe" : "#fff",
+                fontSize: 14, fontWeight: 600, color: hasHealthIns === opt.val ? "#7c5cf6" : "#8e8e93",
+                cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
+              }}>{opt.label}</button>
+            ))}
+          </div>
+          {hasHealthIns && (
+            <div>
+              <div style={{ marginBottom: 6, fontSize: 13, fontWeight: 600, color: "#000" }}>Total coverage amount</div>
+              <div style={{ fontSize: 38, fontWeight: 900, color: "#000", letterSpacing: -1.5, lineHeight: 1, marginBottom: 6 }}>{coverDisplay}</div>
+              <div style={{ fontSize: 13, color: "#8e8e93", marginBottom: 18 }}>sum insured</div>
+              <input type="range" min={1} max={40} value={healthCoverSlider} onChange={e => setHealthCoverSlider(Number(e.target.value))} style={{ width: "100%" }} />
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#8e8e93", fontWeight: 500, marginTop: 6 }}>
+                <span>₹1L</span><span>₹1Cr+</span>
+              </div>
+            </div>
+          )}
+          <WhyBox text="Most families are underinsured. A single surgery can cost ₹4–10L — your cover needs to keep pace with actual costs." />
+          <div style={{ height: 120 }} />
+        </div>
+        <StickyCTA label="Continue →" onClick={advance} />
+      </div>
+    );
+  }
+
+  /* Q9 — Life insurance */
+  if (step === 9) {
+    const coverDisplay = formatL(lifeCoverSlider);
+    return (
+      <div className="flex flex-col h-full" style={{ background: "#f2f2f7" }}>
+        <QHeader step={9} total={10} label="Life insurance" onBack={handleBack} />
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: "22px 22px 0" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#000", letterSpacing: -0.4, lineHeight: 1.2, marginBottom: 8 }}>Do you have life insurance?</div>
+          <div style={{ fontSize: 14, color: "#8e8e93", lineHeight: 1.55, marginBottom: 22 }}>Term plan, LIC policy, or any policy that pays your family if you pass away.</div>
+          <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+            {[{ val: true, label: "Yes, I do" }, { val: false, label: "No" }].map(opt => (
+              <button key={String(opt.val)} onClick={() => setHasLifeIns(opt.val)} style={{
+                flex: 1, padding: 12, borderRadius: 12, border: `2px solid ${hasLifeIns === opt.val ? "#7c5cf6" : "#e5e5ea"}`,
+                background: hasLifeIns === opt.val ? "#ede9fe" : "#fff",
+                fontSize: 14, fontWeight: 600, color: hasLifeIns === opt.val ? "#7c5cf6" : "#8e8e93",
+                cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
+              }}>{opt.label}</button>
+            ))}
+          </div>
+          {hasLifeIns && (
+            <div>
+              <div style={{ marginBottom: 6, fontSize: 13, fontWeight: 600, color: "#000" }}>Sum assured</div>
+              <div style={{ fontSize: 38, fontWeight: 900, color: "#000", letterSpacing: -1.5, lineHeight: 1, marginBottom: 6 }}>{coverDisplay}</div>
+              <div style={{ fontSize: 13, color: "#8e8e93", marginBottom: 18 }}>death benefit</div>
+              <input type="range" min={5} max={200} value={lifeCoverSlider} onChange={e => setLifeCoverSlider(Number(e.target.value))} style={{ width: "100%" }} />
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#8e8e93", fontWeight: 500, marginTop: 6 }}>
+                <span>₹5L</span><span>₹2Cr+</span>
+              </div>
+            </div>
+          )}
+          <WhyBox text="65% of Indian families have zero life cover. If you earn, your family's financial security depends entirely on you staying alive." />
+          <div style={{ height: 120 }} />
+        </div>
+        <StickyCTA label="Continue →" onClick={advance} />
+      </div>
+    );
+  }
+
+  /* Q10 — City */
+  const filteredCities = cityInput.trim().length >= 1
+    ? CITIES.filter(c => c.toLowerCase().startsWith(cityInput.toLowerCase())).slice(0, 8)
+    : CITIES.slice(0, 8);
 
   return (
-    <div className="relative flex flex-col h-full" style={{ backgroundColor: "#ffffff" }}>
-      <HeroBg />
-
-      {/* ── Header: back + progress ────────────────────────────── */}
-      <div className="relative flex flex-col gap-3 items-start w-full px-4 pt-3">
-        <button onClick={handleBack} className="flex items-center justify-center cursor-pointer" style={{ width: 24, height: 24 }}>
-          <img alt="Back" src="./assets/icons/chevron-left.svg" className="w-full h-full" />
-        </button>
-        <ProgressBar current={step} total={questions.length} />
-      </div>
-
-      {/* ── Scrollable question content ────────────────────────── */}
-      <div className="relative flex-1 overflow-y-auto no-scrollbar px-4 pt-6 pb-28">
-        <p className="font-semibold text-[#121212]" style={{ fontSize: 28, lineHeight: "36px", letterSpacing: "-0.1px" }}>
-          {question.title}
-        </p>
-
-        {question.subtitle && (
-          <p className="mt-2" style={{ fontSize: 14, lineHeight: "20px", color: "#7a787d" }}>
-            {question.subtitle}
-          </p>
-        )}
-
-        {question.type === "input" ? (
-          <InputQuestion question={question} values={inputValues} onChange={handleInputChange} />
-        ) : (
-          <OptionsQuestion
-            question={question}
-            selected={selectedOptions}
-            onToggle={toggleOption}
-            counterValue={counterValue}
-            onCounterChange={handleCounterChange}
-            followUpValue={followUpValue}
-            onFollowUpChange={handleFollowUpChange}
+    <div className="flex flex-col h-full" style={{ background: "#f2f2f7" }}>
+      <QHeader step={10} total={10} label="Almost there!" onBack={handleBack} />
+      <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: "22px 22px 0" }}>
+        <div style={{ fontSize: 24, fontWeight: 800, color: "#000", letterSpacing: -0.4, lineHeight: 1.2, marginBottom: 8 }}>Where does your family live?</div>
+        <div style={{ fontSize: 14, color: "#8e8e93", lineHeight: 1.55, marginBottom: 22 }}>Hospital costs vary significantly by city. Metro hospitals charge 2–3× more than tier-2 cities.</div>
+        <div style={{ position: "relative", marginBottom: 12 }}>
+          <input
+            type="text"
+            placeholder="City or PIN code"
+            value={cityInput}
+            onChange={e => { setCityInput(e.target.value); setCity(e.target.value); }}
+            style={{
+              width: "100%", padding: "16px 18px", fontSize: 17, fontWeight: 600,
+              background: "#fff", border: `2px solid ${city ? "#7c5cf6" : "#e5e5ea"}`, borderRadius: 16,
+              outline: "none", fontFamily: "inherit", color: "#000", boxSizing: "border-box",
+              transition: "border-color 0.2s",
+            }}
           />
-        )}
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+          {filteredCities.map(c => (
+            <div key={c} onClick={() => { setCity(c); setCityInput(c); }} style={{
+              padding: "7px 14px", background: city === c ? "#ede9fe" : "#fff",
+              border: `1.5px solid ${city === c ? "#7c5cf6" : "#e5e5ea"}`,
+              borderRadius: 20, fontSize: 13, fontWeight: 500, color: city === c ? "#7c5cf6" : "#000", cursor: "pointer", transition: "all 0.2s",
+            }}>{c}</div>
+          ))}
+        </div>
+        <WhyBox text="A knee replacement in Mumbai costs ₹3.5L; the same in Nagpur costs ₹1.8L. Location calibrates your risk numbers to real local costs." />
+        <div style={{ marginTop: 16, background: "#fff", borderRadius: 14, border: "1px solid #e5e5ea", padding: "12px 16px", display: "flex", gap: 10, alignItems: "center" }}>
+          <div style={{ fontSize: 18 }}>🔒</div>
+          <div style={{ fontSize: 13, color: "#8e8e93", lineHeight: 1.5 }}>Your data is only used to calculate your risk score. Never stored or shared.</div>
+        </div>
+        <div style={{ height: 120 }} />
       </div>
-
-      {/* ── Bottom CTA ─────────────────────────────────────────── */}
-      <div
-        className="absolute bottom-0 left-0 w-full flex flex-col items-center px-5 pb-5 pt-3"
-        style={{ boxShadow: "0px -4px 8px rgba(54,53,76,0.06)", backgroundColor: "#ffffff" }}
-      >
-        <button
-          onClick={handleContinue}
-          className="w-full flex items-center justify-center rounded-lg cursor-pointer"
-          style={{
-            height: 48,
-            backgroundColor: canContinue ? "#121212" : "#e8e8e8",
-            transition: "background-color 0.2s ease",
-          }}
-        >
-          <span
-            className="font-semibold text-center"
-            style={{ fontSize: 16, lineHeight: "22px", color: canContinue ? "#ffffff" : "#a0a0a0" }}
-          >
-            {isLast ? "Finish" : "Continue"}
-          </span>
-        </button>
-      </div>
+      <StickyCTA label="Calculate my risk →" disabled={city.trim().length < 2} onClick={handleComplete} />
     </div>
   );
 }
