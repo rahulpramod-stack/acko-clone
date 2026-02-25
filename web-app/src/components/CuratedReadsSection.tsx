@@ -46,9 +46,9 @@ function ArticleCard({ article, active }: { article: Article; active: boolean })
       className="shrink-0 flex flex-col gap-3 p-3 bg-[#f0f0f0] transition-all duration-300"
       style={{
         width: CARD_WIDTH,
+        height: 220,
         borderRadius: active ? 20 : 10,
         opacity: active ? 1 : 0.4,
-        transform: active ? "scale(1)" : "scale(0.92)",
       }}
     >
       <div className="overflow-hidden rounded-[12px] shrink-0" style={{ height: 114 }}>
@@ -60,7 +60,7 @@ function ArticleCard({ article, active }: { article: Article; active: boolean })
         </span>
         <p
           className="font-semibold text-[#3b3b3b]"
-          style={{ fontSize: active ? 16 : 14, lineHeight: "20px", letterSpacing: active ? "-0.64px" : "-0.56px" }}
+          style={{ fontSize: 14, lineHeight: "20px", letterSpacing: "-0.56px" }}
         >
           {article.headline}
         </p>
