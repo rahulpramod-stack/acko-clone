@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #1a1a2e;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Euclid Circular B', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Scrollbar hidden for phone frame */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Chatbot section entrance animation ─────────────────────────────────── */
+@keyframes chatbot-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* All child groups start invisible */
+.chatbot-child { opacity: 0; }
+
+/* When the section scrolls into view, animate each child group in sequence */
+.chatbot-visible .chatbot-child {
+  animation: chatbot-enter 400ms ease-out forwards;
+}
+.chatbot-visible .chatbot-d0 { animation-delay: 0ms; }
+.chatbot-visible .chatbot-d1 { animation-delay: 80ms; }
+.chatbot-visible .chatbot-d2 { animation-delay: 180ms; }
+.chatbot-visible .chatbot-d3 { animation-delay: 280ms; }
+.chatbot-visible .chatbot-d4 { animation-delay: 370ms; }
