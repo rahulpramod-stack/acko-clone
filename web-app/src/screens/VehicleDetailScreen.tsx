@@ -146,16 +146,6 @@ export default function VehicleDetailScreen({ onBack }: { onBack: () => void }) 
       {/* ── Dark header ─────────────────────────────────────────────────── */}
       <div style={{ backgroundColor: "#19191a" }}>
 
-        {/* Status bar */}
-        <div className="flex items-center justify-between px-5" style={{ height: 40 }}>
-          <p className="text-white font-bold" style={{ fontSize: 13 }}>23:10</p>
-          <div className="flex gap-1 items-center">
-            <div style={{ width: 16, height: 11, backgroundColor: "rgba(255,255,255,0.7)", borderRadius: 2 }} />
-            <div style={{ width: 15, height: 11, backgroundColor: "rgba(255,255,255,0.7)", borderRadius: 2 }} />
-            <div style={{ width: 25, height: 13, backgroundColor: "rgba(255,255,255,0.5)", borderRadius: 3, border: "1px solid rgba(255,255,255,0.4)" }} />
-          </div>
-        </div>
-
         {/* Back nav */}
         <div className="flex items-center px-5 py-3">
           <button onClick={onBack} className="flex items-center justify-center -ml-0.5">
