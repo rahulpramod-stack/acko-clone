@@ -19,7 +19,7 @@ const imgInfoIcon   = "./assets/figma/info-icon.svg";
 
 function ArrowBtnWhite() {
   return (
-    <div className="overflow-hidden shrink-0" style={{ width: 22, height: 22 }}>
+    <div className="overflow-hidden shrink-0" style={{ width: 20, height: 20 }}>
       <img src="./assets/icons/arrow-right.svg" alt="" className="w-full h-full" />
     </div>
   );
@@ -27,7 +27,7 @@ function ArrowBtnWhite() {
 
 function ArrowBtnDark() {
   return (
-    <div className="overflow-hidden shrink-0" style={{ width: 22, height: 22 }}>
+    <div className="overflow-hidden shrink-0" style={{ width: 20, height: 20 }}>
       <img src="./assets/icons/arrow-right-dark.svg" alt="" className="w-full h-full" />
     </div>
   );
@@ -149,7 +149,7 @@ export default function VehicleDetailScreen({ onBack }: { onBack: () => void }) 
         {/* Back nav */}
         <div className="flex items-center px-5 py-3">
           <button onClick={onBack} className="flex items-center justify-center -ml-0.5">
-            <div className="relative" style={{ width: 11, height: 24 }}>
+            <div className="relative" style={{ width: 11, height: 20 }}>
               <img alt="Back" className="absolute inset-0 w-full h-full object-contain" src={imgBackIcon} />
             </div>
           </button>
