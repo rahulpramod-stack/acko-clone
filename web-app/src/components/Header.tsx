@@ -1,4 +1,5 @@
 import Lottie from "lottie-react";
+import crownAnimation from "../assets/animated/crown.json";
 
 export default function Header() {
   return (
@@ -15,7 +16,7 @@ export default function Header() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1 border border-[#fff09d] rounded-full px-2 py-1">
           <Lottie
-            path="./assets/animated/crown.json"
+            animationData={crownAnimation}
             loop
             autoplay
             style={{ width: 22, height: 22 }}
