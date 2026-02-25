@@ -1,5 +1,7 @@
+import FloatingCategoryNav, { useNavScrollVisibility, type Category } from "../components/FloatingCategoryNav";
+
 const imgCarImage   = "./assets/figma/car-tata-punch.png";
-const imgBackIcon   = "./assets/figma/back-icon.svg";
+const imgBackIcon   = "./assets/icons/chevron-left.svg";
 const imgCityLogo   = "./assets/figma/car-city-logo.png";
 const imgPunchLogo  = "./assets/figma/car-punch-logo.png";
 const imgThirdCar   = "./assets/figma/car-third.png";
@@ -139,9 +141,12 @@ function MoreActionRow({ icon, label }: { icon: string; label: string }) {
   );
 }
 
-export default function VehicleDetailScreen({ onBack }: { onBack: () => void }) {
+export default function VehicleDetailScreen({ onBack, onCategoryChange }: { onBack: () => void; onCategoryChange?: (cat: Category) => void }) {
+  const { scrollRef, visible } = useNavScrollVisibility();
+
   return (
-    <div className="overflow-y-auto no-scrollbar flex flex-col h-full">
+    <div className="relative flex flex-col h-full">
+      <div ref={scrollRef} className="overflow-y-auto no-scrollbar flex-1" style={{ paddingBottom: 100 }}>
 
       {/* ── Dark header ─────────────────────────────────────────────────── */}
       <div style={{ backgroundColor: "#19191a" }}>
@@ -149,8 +154,8 @@ export default function VehicleDetailScreen({ onBack }: { onBack: () => void }) 
         {/* Back nav */}
         <div className="flex items-center px-5 py-3">
           <button onClick={onBack} className="flex items-center justify-center -ml-0.5">
-            <div className="relative" style={{ width: 11, height: 20 }}>
-              <img alt="Back" className="absolute inset-0 w-full h-full object-contain" src={imgBackIcon} />
+            <div className="relative" style={{ width: 24, height: 24 }}>
+              <img alt="Back" className="absolute inset-0 w-full h-full object-contain" src={imgBackIcon} style={{ filter: "brightness(0) invert(1)" }} />
             </div>
           </button>
         </div>
@@ -420,6 +425,13 @@ export default function VehicleDetailScreen({ onBack }: { onBack: () => void }) 
         </div>
       </div>
 
+      </div>
+
+      <FloatingCategoryNav
+        active="vehicles"
+        visible={visible}
+        onTabChange={(tab) => onCategoryChange?.(tab)}
+      />
     </div>
   );
 }

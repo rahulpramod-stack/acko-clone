@@ -84,7 +84,7 @@ function EntityCard({
   );
 }
 
-export default function PersonalCardsSection({ onVehicleClick }: { onVehicleClick?: () => void }) {
+export default function PersonalCardsSection({ onVehicleClick, onFamilyClick }: { onVehicleClick?: () => void; onFamilyClick?: () => void }) {
   return (
     <div className="flex flex-col gap-5 pb-6" style={{ backgroundColor: "#19191a" }}>
       <div className="flex flex-col gap-5 px-4 pt-5">
@@ -114,6 +114,7 @@ export default function PersonalCardsSection({ onVehicleClick }: { onVehicleClic
                   <AvatarCircle initials="+2" />
                 </AvatarStack>
               }
+              onClick={onFamilyClick}
             />
           </div>
           <div className="flex gap-3">
