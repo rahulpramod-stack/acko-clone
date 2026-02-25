@@ -1,13 +1,11 @@
-const imgCrownIcon = "./assets/figma/crown-icon.gif";
+import Lottie from "lottie-react";
 
 export default function Header() {
   return (
     <div className="flex items-center justify-between px-4 pt-3 pb-4">
       {/* Left: avatar + greeting */}
       <div className="flex items-center gap-2">
-        <div
-          className="w-8 h-8 rounded-full bg-[#5920C5] flex items-center justify-center"
-        >
+        <div className="w-8 h-8 rounded-full bg-[#5920C5] flex items-center justify-center">
           <span className="text-white text-base font-medium">S</span>
         </div>
         <span className="text-white text-sm">Hey Supratik</span>
@@ -16,7 +14,12 @@ export default function Header() {
       {/* Right: Privileges + bell */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1 border border-[#fff09d] rounded-full px-2 py-1">
-          <img src={imgCrownIcon} className="w-5 h-5 object-contain" alt="crown" />
+          <Lottie
+            path="./assets/animated/crown.json"
+            loop
+            autoplay
+            style={{ width: 22, height: 22 }}
+          />
           <span className="text-[#FBE67B] text-xs font-medium">Privileges</span>
         </div>
         <div className="relative">
