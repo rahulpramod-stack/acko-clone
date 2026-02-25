@@ -1,5 +1,5 @@
-const imgArticleFamily = "https://www.figma.com/api/mcp/asset/35295eb9-5ee3-4cfc-a9f1-d5dcac7ceb9d";
-const imgArticleWoman  = "https://www.figma.com/api/mcp/asset/1469e322-6aa0-4792-ba8a-c17c9dea598c";
+const imgArticleFamily = "./assets/figma/article-family.png";
+const imgArticleWoman  = "./assets/figma/article-woman.jpg";
 
 function ArticleCard({
   image,

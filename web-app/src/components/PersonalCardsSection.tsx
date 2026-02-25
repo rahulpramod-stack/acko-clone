@@ -1,5 +1,5 @@
-const imgCityLogo   = "https://www.figma.com/api/mcp/asset/764b3535-8c4e-4e59-97a1-42479d9c00f9";
-const imgCretaLogo  = "https://www.figma.com/api/mcp/asset/0914e72f-656e-4187-bb0f-b647211875c5";
+const imgCityLogo   = "./assets/figma/car-city-logo-2.png";
+const imgCretaLogo  = "./assets/figma/car-creta-logo.png";
 const imgFlightIcon = "./assets/icons/trips.svg";
 const imgPhoneIcon  = "./assets/icons/devices.svg";
 

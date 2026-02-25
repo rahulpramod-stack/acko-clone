@@ -1,5 +1,5 @@
-const imgIllustration = "https://www.figma.com/api/mcp/asset/b5b0c963-aaa9-4966-90b8-3178b81bad09";
-const imgArrow        = "https://www.figma.com/api/mcp/asset/7f311c73-32d7-47df-b0f7-01fa4c350d2b";
+const imgIllustration = "./assets/figma/illustration.png";
+const imgArrow        = "./assets/figma/arrow-small.svg";
 
 export default function CrossSellCard() {
   return (

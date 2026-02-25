@@ -1,5 +1,5 @@
-const imgVisaBg    = "https://www.figma.com/api/mcp/asset/19e6a71f-bd1b-49fc-946c-a88cdb935d8d";
-const imgAmbulance = "https://www.figma.com/api/mcp/asset/6e485cdf-a204-490a-9c34-9bf51b9fa3d2";
+const imgVisaBg    = "./assets/figma/visa-bg.png";
+const imgAmbulance = "./assets/figma/ambulance.png";
 const imgArrow     = "./assets/icons/arrow right.svg";
 
 const cards = [

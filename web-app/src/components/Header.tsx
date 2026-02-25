@@ -1,4 +1,4 @@
-const imgCrownIcon = "https://www.figma.com/api/mcp/asset/8a0d3939-fc93-43a9-ae6d-875a6115e9c2";
+const imgCrownIcon = "./assets/figma/crown-icon.gif";
 
 export default function Header() {
   return (
