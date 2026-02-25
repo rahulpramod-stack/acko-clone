@@ -1,10 +1,10 @@
-const imgBackIcon     = "./assets/icons/chevron-left.svg";
-const imgSedan        = "./assets/figma/notifications/sedan.png";
-const imgCarWill      = "./assets/figma/notifications/car-will.png";
-const imgHealth       = "./assets/figma/notifications/health-icon.png";
-const imgAbha         = "./assets/figma/notifications/abha-icon.png";
-const imgFastag       = "./assets/figma/notifications/fastag-icon.png";
-const imgClaim        = "./assets/figma/notifications/claim-icon.png";
+const imgBackIcon = "./assets/icons/chevron-left.svg";
+const imgCarN     = "./assets/figma/notifications/car-n.png";
+const imgTransferN = "./assets/figma/notifications/transfer-n.png";
+const imgPlatinumN = "./assets/figma/notifications/platinum-n.png";
+const imgAbhaN    = "./assets/figma/notifications/abha-n.png";
+const imgFastagN  = "./assets/figma/notifications/fastag-n.png";
+const imgClaimN   = "./assets/figma/notifications/claim-n.png";
 
 /* ── Shared sub-components ──────────────────────────────── */
 
@@ -38,6 +38,9 @@ function ActionButton({ label }: { label: string }) {
         color: "#121212",
         backgroundColor: "transparent",
         cursor: "pointer",
+        alignSelf: "flex-start",  // hug content width, left-aligned
+        display: "block",
+        whiteSpace: "nowrap",
       }}
     >
       {label}
@@ -271,21 +274,7 @@ export default function NotificationsScreen({ onBack }: Props) {
           <div className="flex flex-col">
             <AlertCard
               highlighted
-              icon={
-                <img
-                  src={imgSedan}
-                  alt=""
-                  style={{
-                    position: "absolute",
-                    width: 88,
-                    height: 27,
-                    bottom: "15%",
-                    left: 3,
-                    transform: "scaleY(-1) rotate(180deg)",
-                    objectFit: "contain",
-                  }}
-                />
-              }
+              icon={<CenteredIcon src={imgCarN} size={36} />}
               badge="Due in 3 days"
               source="VIRTUS • KA13AH9287"
               title="Your car insurance expires on 23 Aug 2025"
@@ -295,21 +284,7 @@ export default function NotificationsScreen({ onBack }: Props) {
 
             <AlertCard
               highlighted
-              icon={
-                <img
-                  src={imgCarWill}
-                  alt=""
-                  style={{
-                    position: "absolute",
-                    width: 36,
-                    height: 31,
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    objectFit: "contain",
-                  }}
-                />
-              }
+              icon={<CenteredIcon src={imgTransferN} size={36} />}
               source="VIRTUS • KA13AH9287"
               title="Ownership transfer request was cancelled"
               subtitle="Upload your documents again to transfer"
@@ -317,7 +292,7 @@ export default function NotificationsScreen({ onBack }: Props) {
             />
 
             <AlertCard
-              icon={<CenteredIcon src={imgHealth} size={29} />}
+              icon={<CenteredIcon src={imgPlatinumN} size={36} />}
               source="ACKO PLATINUM HEALTH"
               title="Add bank details to update policy"
               subtitle="We can't complete the update without bank details."
@@ -343,17 +318,17 @@ export default function NotificationsScreen({ onBack }: Props) {
 
           <div className="flex flex-col">
             <MoreItem
-              icon={<CenteredIcon src={imgAbha} size={34} />}
+              icon={<CenteredIcon src={imgAbhaN} size={36} />}
               title="Create your ABHA ID on ACKO"
               subtitle="AIIMS and other top hospitals now use ABHA to access health records."
             />
             <MoreItem
-              icon={<CenteredIcon src={imgFastag} size={38} />}
+              icon={<CenteredIcon src={imgFastagN} size={36} />}
               title="FASTag balance is running low!"
               subtitle="Check & recharge your FASTag balance instantly."
             />
             <MoreItem
-              icon={<CenteredIcon src={imgClaim} size={35} />}
+              icon={<CenteredIcon src={imgClaimN} size={36} />}
               title="Claim limit per year?"
               subtitle="How many times can you claim insurance in a year?"
             />
