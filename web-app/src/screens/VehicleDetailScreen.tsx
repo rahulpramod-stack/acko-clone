@@ -73,7 +73,7 @@ function AssetStatusCard({ data }: { data: StatusCardData }) {
                   {data.value}
                 </p>
               )}
-              <div className="relative shrink-0" style={{ width: 24, height: 24 }}>
+              <div className="relative shrink-0" style={{ width: 16, height: 16 }}>
                 <img alt="" className="absolute inset-0 w-full h-full" src={imgRefreshIcon} />
               </div>
             </div>
@@ -251,7 +251,7 @@ export default function VehicleDetailScreen({ onBack }: { onBack: () => void }) 
               <p className="font-medium" style={{ fontSize: 12, lineHeight: "18px", color: "#0FA457" }}>
                 Active
               </p>
-              <div className="relative shrink-0" style={{ width: 24, height: 24 }}>
+              <div className="relative shrink-0" style={{ width: 16, height: 16 }}>
                 <img alt="" className="absolute inset-0 w-full h-full" src={imgRefreshIcon} />
               </div>
             </div>
