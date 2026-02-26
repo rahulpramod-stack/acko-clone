@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useProfile } from "../contexts/ProfileContext";
 
 const imgAmbu1 = "./assets/lob/Towing my car.png";
 const imgAmbu2 = "./assets/lob/Book ambulance.png";
@@ -331,6 +332,7 @@ function SuggestionBubble({ text, borderRadius = "16px 16px 16px 4px" }: { text:
 }
 
 function ChatbotSection() {
+  const { profile } = useProfile();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -389,7 +391,7 @@ function ChatbotSection() {
         </div>
 
         <p className="text-center" style={{ fontSize: 20, lineHeight: "28px", letterSpacing: -0.1 }}>
-          <span className="font-semibold text-[#121212]">Hi Vishwanath, </span>
+          <span className="font-semibold text-[#121212]">Hi {profile.firstName}, </span>
           <span className="text-[#121212]" style={{ fontWeight: 400 }}>I&apos;m here to help </span>
           <br />
           <span className="text-[#121212]" style={{ fontWeight: 400 }}>with anything on ACKO</span>

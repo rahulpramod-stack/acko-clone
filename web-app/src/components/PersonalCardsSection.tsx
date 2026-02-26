@@ -1,3 +1,7 @@
+import { useState } from "react";
+import { useProfile } from "../contexts/ProfileContext";
+import ProfileSwitcherSheet from "./ProfileSwitcherSheet";
+
 const imgCityLogo   = "./assets/figma/car-city-logo-2.png";
 const imgCretaLogo  = "./assets/figma/car-creta-logo.png";
 const imgFlightIcon = "./assets/icons/trips.svg";
@@ -88,18 +92,35 @@ export default function PersonalCardsSection({
   onVehicleClick,
   onFamilyClick,
   onNotificationsClick,
+  onViewProfile,
 }: {
   onVehicleClick?: () => void;
   onFamilyClick?: () => void;
   onNotificationsClick?: () => void;
+  onViewProfile?: () => void;
 }) {
+  const { profile } = useProfile();
+  const [showSwitcher, setShowSwitcher] = useState(false);
   return (
+    <>
     <div className="flex flex-col gap-5 pb-6" style={{ backgroundColor: "#19191a" }}>
       <div className="flex flex-col gap-5 px-4 pt-5">
         <div className="flex items-center justify-between">
-          <p className="font-semibold text-white" style={{ fontSize: 20, lineHeight: "28px", letterSpacing: "-0.1px" }}>
-            Vishwanath's home
-          </p>
+          {/* Avatar + greeting */}
+          <button
+            onClick={() => setShowSwitcher(true)}
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}
+          >
+            <div style={{
+              width: 32, height: 32, borderRadius: "50%", background: profile.color, flexShrink: 0,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{profile.initials.charAt(0)}</span>
+            </div>
+            <p className="font-semibold text-white" style={{ fontSize: 20, lineHeight: "28px", letterSpacing: "-0.1px" }}>
+              {profile.firstName}'s home
+            </p>
+          </button>
           <button
             onClick={onNotificationsClick}
             className="relative flex items-center justify-center"
@@ -166,5 +187,12 @@ export default function PersonalCardsSection({
         </div>
       </div>
     </div>
+    {showSwitcher && (
+      <ProfileSwitcherSheet
+        onClose={() => setShowSwitcher(false)}
+        onViewProfile={onViewProfile}
+      />
+    )}
+    </>
   );
 }

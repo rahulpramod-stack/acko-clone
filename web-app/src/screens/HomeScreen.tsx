@@ -6,11 +6,11 @@ import HealthSection       from "../components/HealthSection";
 import GoBeyondSection     from "../components/GoBeyondSection";
 import Footer              from "../components/Footer";
 
-export default function ExploreScreen() {
+export default function ExploreScreen({ onViewProfile }: { onViewProfile?: () => void }) {
   return (
     <div className="overflow-y-auto no-scrollbar h-full bg-[#060606]">
       <div style={{ background: "linear-gradient(to bottom, #060606, #1a0a3e)" }}>
-        <Header />
+        <Header onViewProfile={onViewProfile} />
         <CrossSellCard />
       </div>
 

@@ -8,8 +8,10 @@ import QuestionnaireScreen, { type Question } from "./screens/QuestionnaireScree
 import AnalysingScreen from "./screens/AnalysingScreen";
 import ScoreAnalysisScreen from "./screens/ScoreAnalysisScreen";
 import NotificationsScreen from "./screens/NotificationsScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 import BottomNav, { type Tab } from "./components/BottomNav";
 import type { Category } from "./components/FloatingCategoryNav";
+import { ProfileProvider } from "./contexts/ProfileContext";
 
 type View =
   | { type: "tabs" }
@@ -18,7 +20,8 @@ type View =
   | { type: "questionnaire" }
   | { type: "analysing" }
   | { type: "score-analysis" }
-  | { type: "notifications" };
+  | { type: "notifications" }
+  | { type: "profile" };
 
 const bgByTab: Record<Tab, string> = {
   home: "#19191a",
@@ -139,7 +142,7 @@ const riskQuestions: Question[] = [
   },
 ];
 
-export default function App() {
+function AppInner() {
   const [activeTab, setActiveTab] = useState<Tab>("home");
   const [view, setView] = useState<View>({ type: "tabs" });
 
@@ -166,6 +169,13 @@ export default function App() {
       </div>
     </div>
   );
+
+  if (view.type === "profile") {
+    return shell(
+      "#ebebeb",
+      <ProfileScreen onBack={() => setView({ type: "tabs" })} />,
+    );
+  }
 
   if (view.type === "notifications") {
     return shell(
@@ -242,13 +252,22 @@ export default function App() {
               onVehicleClick={() => setView({ type: "vehicle-detail" })}
               onFamilyClick={() => setView({ type: "family" })}
               onNotificationsClick={() => setView({ type: "notifications" })}
+              onViewProfile={() => setView({ type: "profile" })}
             />
           )}
-          {activeTab === "explore" && <ExploreScreen />}
+          {activeTab === "explore" && <ExploreScreen onViewProfile={() => setView({ type: "profile" })} />}
           {activeTab === "support" && <SupportTabScreen />}
         </div>
         <BottomNav active={activeTab} onTabChange={setActiveTab} />
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ProfileProvider>
+      <AppInner />
+    </ProfileProvider>
   );
 }

@@ -5,14 +5,16 @@ export default function HomeTabScreen({
   onVehicleClick,
   onFamilyClick,
   onNotificationsClick,
+  onViewProfile,
 }: {
   onVehicleClick?: () => void;
   onFamilyClick?: () => void;
   onNotificationsClick?: () => void;
+  onViewProfile?: () => void;
 }) {
   return (
     <div className="overflow-y-auto no-scrollbar flex flex-col h-full" style={{ backgroundColor: "#19191a" }}>
-      <PersonalCardsSection onVehicleClick={onVehicleClick} onFamilyClick={onFamilyClick} onNotificationsClick={onNotificationsClick} />
+      <PersonalCardsSection onVehicleClick={onVehicleClick} onFamilyClick={onFamilyClick} onNotificationsClick={onNotificationsClick} onViewProfile={onViewProfile} />
       <CuratedReadsSection />
     </div>
   );
