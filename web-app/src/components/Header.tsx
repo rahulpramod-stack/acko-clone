@@ -11,9 +11,9 @@ export default function Header({ onNotificationsClick }: Props) {
       {/* Left: avatar + greeting */}
       <div className="flex items-center gap-2">
         <div className="w-8 h-8 rounded-full bg-[#5920C5] flex items-center justify-center">
-          <span className="text-white text-base font-medium">S</span>
+          <span className="text-white text-base font-medium">V</span>
         </div>
-        <span className="text-white text-sm">Hey Supratik</span>
+        <span className="text-white text-sm">Hey Vishwanath</span>
       </div>
 
       {/* Right: Privileges + bell */}

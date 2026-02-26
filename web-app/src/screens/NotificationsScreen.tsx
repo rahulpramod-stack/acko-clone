@@ -231,13 +231,15 @@ export default function NotificationsScreen({ onBack }: Props) {
           <button
             onClick={onBack}
             className="flex items-center justify-center"
-            style={{ width: 24, height: 24 }}
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
           >
-            <img
-              src={imgBackIcon}
-              alt="Back"
-              style={{ width: 10, height: 20, objectFit: "contain" }}
-            />
+            <div className="relative" style={{ width: 24, height: 24 }}>
+              <img
+                src={imgBackIcon}
+                alt="Back"
+                className="absolute inset-0 w-full h-full object-contain"
+              />
+            </div>
           </button>
         </div>
 

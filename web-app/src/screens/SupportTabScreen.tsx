@@ -389,7 +389,7 @@ function ChatbotSection() {
         </div>
 
         <p className="text-center" style={{ fontSize: 20, lineHeight: "28px", letterSpacing: -0.1 }}>
-          <span className="font-semibold text-[#121212]">Hi Aashiq, </span>
+          <span className="font-semibold text-[#121212]">Hi Vishwanath, </span>
           <span className="text-[#121212]" style={{ fontWeight: 400 }}>I&apos;m here to help </span>
           <br />
           <span className="text-[#121212]" style={{ fontWeight: 400 }}>with anything on ACKO</span>
